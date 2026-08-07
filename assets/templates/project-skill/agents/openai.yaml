@@ -1,0 +1,4 @@
+interface:
+  display_name: "{{projectName}} Maintainer"
+  short_description: "{{shortDescription}}"
+  default_prompt: "Use ${{skillName}} to make a well-verified change to this project."

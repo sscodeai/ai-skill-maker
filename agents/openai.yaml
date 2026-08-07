@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Skill Maker"
+  short_description: "Create reusable AI skills and instruction bundles"
+  default_prompt: "Use $ai-skill-maker to create or refresh an AI skill or instruction bundle."
