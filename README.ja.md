@@ -49,6 +49,8 @@ AI Skill Maker は次のような出力を作成または refresh すること�
 - project-maintainer skill rendering and validation
 - `AGENTS.md`、`CLAUDE.md`、Cursor rules、`.github/copilot-instructions.md` 向け adapter rendering
 - user-authored blocks を保持する refresh preservation
+- functional-skill intake と existing-skill refresh checklists
+- skills と artifacts 向けに一般化した evidence / language policies
 - local install and self-check scripts
 
 次の revisions で、general skill output schemas、functional-skill intake、generalized templates、examples、forward tests を追加します。

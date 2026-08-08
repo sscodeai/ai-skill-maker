@@ -49,6 +49,8 @@ The initial scaffold includes compatibility tooling inherited from `ai-project-s
 - project-maintainer skill rendering and validation
 - adapter rendering for `AGENTS.md`, `CLAUDE.md`, Cursor rules, and `.github/copilot-instructions.md`
 - refresh preservation for user-authored blocks
+- functional-skill intake and existing-skill refresh checklists
+- generalized evidence and language policies for skills and artifacts
 - local install and self-check scripts
 
 The next revisions add general skill output schemas, functional-skill intake, generalized templates, examples, and forward tests.

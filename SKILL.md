@@ -13,12 +13,12 @@ Keep this `SKILL.md` small. Load only the references needed for the requested mo
 
 ## Mode Selection
 
-- Use **functional skill mode** when the output skill should perform a reusable capability such as creating presentations, Markdown reports, PDFs, spreadsheets, images, data workflows, or API tasks. Read `references/modes/functional-skill.md`.
-- Use **document/template skill mode** when artifact structure, style, assets, or rendered fidelity are central. Read `references/modes/document-template-skill.md`.
-- Use **workflow automation skill mode** when the skill should run repeatable operational procedures through tools, CLIs, APIs, browser/app automation, or scripts. Read `references/modes/workflow-automation-skill.md`.
+- Use **functional skill mode** when the output skill should perform a reusable capability such as creating presentations, Markdown reports, PDFs, spreadsheets, images, data workflows, or API tasks. Read `references/modes/functional-skill.md` and `references/checklists/functional-skill-intake.md`.
+- Use **document/template skill mode** when artifact structure, style, assets, or rendered fidelity are central. Read `references/modes/document-template-skill.md` and `references/checklists/functional-skill-intake.md`.
+- Use **workflow automation skill mode** when the skill should run repeatable operational procedures through tools, CLIs, APIs, browser/app automation, or scripts. Read `references/modes/workflow-automation-skill.md` and `references/checklists/functional-skill-intake.md`.
 - Use **project maintainer mode** when the output should guide long-term maintenance of a specific software project. Read `references/modes/project-maintainer-skill.md`, then use `references/modes/genesis.md` for intent-first projects or `references/modes/repo.md` for existing repositories.
 - Use **adapter instruction bundle mode** when the user wants `AGENTS.md`, `CLAUDE.md`, Cursor rules, Copilot instructions, or similar assistant files. Read `references/modes/adapter-instruction-bundle.md` and `references/adapters/output-contract.md`.
-- Use **refresh workflow** when updating an existing AI skill or instruction bundle. Preserve user-authored rules and read `references/workflows/refresh.md`, `references/output-schema.md`, `references/rules/evidence-vs-recommendation.md`, and the relevant mode file.
+- Use **refresh workflow** when updating an existing AI skill or instruction bundle. Preserve user-authored rules and read `references/workflows/refresh.md`, `references/checklists/existing-skill-scan.md`, `references/checklists/refresh-skill.md`, `references/output-schema.md`, `references/rules/evidence-vs-recommendation.md`, and the relevant mode file.
 
 If the mode is ambiguous, infer it from available artifacts. Ask only when the choice affects output structure or user intent.
 

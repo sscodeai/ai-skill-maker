@@ -1,14 +1,14 @@
 # Quality Gate
 
-Before delivering a generated project maintainer skill:
+Before delivering a generated AI skill or instruction bundle:
 
-- Validate the rendered output directory, not the raw `assets/templates/project-skill` template.
+- Validate the rendered output directory, not the raw template.
 - Required files exist.
 - `SKILL.md` frontmatter has only `name` and `description`.
 - `agents/openai.yaml` has quoted interface strings.
-- Reference files include an `Evidence Ledger`.
+- Reference files include an `Evidence Ledger` when they contain factual, normative, or inferred claims.
 - Manual preservation blocks exist in generated Markdown files.
-- Observed facts cite source paths when repo evidence exists.
+- Observed facts cite source paths when source evidence exists.
 - Generated instructions are actionable for future AI-assisted maintenance.
 - Verification commands are concrete or clearly marked as recommendations/assumptions.
 - Generated files and edit restrictions are documented.
@@ -18,6 +18,7 @@ Before delivering a generated project maintainer skill:
 Run:
 
 ```bash
+node scripts/validate-skill-output.mjs <output-skill-dir>
 node scripts/validate-project-skill.mjs <output-skill-dir>
 ```
 
