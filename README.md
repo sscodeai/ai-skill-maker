@@ -55,6 +55,14 @@ The next revisions add general skill output schemas, functional-skill intake, ge
 
 ## Scripts
 
+Render a general functional skill from a JSON config:
+
+```bash
+node scripts/render-skill.mjs --init-config functional > config.json
+node scripts/render-skill.mjs --input config.json --output ./generated-skill
+node scripts/validate-skill-output.mjs ./generated-skill
+```
+
 Collect repository signals:
 
 ```bash

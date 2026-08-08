@@ -55,6 +55,14 @@ AI Skill Maker は次のような出力を作成または refresh すること�
 
 ## Scripts
 
+JSON config から general functional skill を生成します。
+
+```bash
+node scripts/render-skill.mjs --init-config functional > config.json
+node scripts/render-skill.mjs --input config.json --output ./generated-skill
+node scripts/validate-skill-output.mjs ./generated-skill
+```
+
 repository signals を収集します。
 
 ```bash

@@ -1,0 +1,4 @@
+interface:
+  display_name: "{{displayName}}"
+  short_description: "{{shortDescription}}"
+  default_prompt: "Use ${{skillName}} to {{defaultTask}}."

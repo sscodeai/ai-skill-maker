@@ -109,6 +109,27 @@ try {
   }
   console.log("OK enriched repo signals shape");
   assertOk("print schema", run(["scripts/render-project-skill.mjs", "--print-schema"]));
+  const functionalConfig = run(["scripts/render-skill.mjs", "--init-config", "functional"]);
+  assertOk("init functional skill config", functionalConfig);
+  JSON.parse(functionalConfig.stdout);
+  const functionalConfigPath = join(temp, "functional-skill-config.json");
+  writeFileSync(functionalConfigPath, functionalConfig.stdout);
+  const functionalOutDir = join(temp, "functional-skill");
+  assertOk("render functional skill", run(["scripts/render-skill.mjs", "--input", functionalConfigPath, "--output", functionalOutDir]));
+  assertOk("validate functional skill", run(["scripts/validate-skill-output.mjs", functionalOutDir]));
+  const functionalIntentPath = join(functionalOutDir, "references", "skill-intent.md");
+  const functionalKeep = "- declared_intent: Preserve this functional skill user rule.";
+  const functionalIntent = readFileSync(functionalIntentPath, "utf8");
+  writeFileSync(
+    functionalIntentPath,
+    functionalIntent.replace(
+      "<!-- BEGIN USER RULES -->\n<!-- Add durable skill-specific rules here. This block is preserved on refresh. -->\n<!-- END USER RULES -->",
+      `<!-- BEGIN USER RULES -->\n${functionalKeep}\n<!-- END USER RULES -->`
+    )
+  );
+  assertOk("refresh functional skill", run(["scripts/render-skill.mjs", "--input", functionalConfigPath, "--output", functionalOutDir]));
+  assertFileIncludes("functional skill preserves user rules", functionalIntentPath, functionalKeep);
+  assertOk("validate refreshed functional skill", run(["scripts/validate-skill-output.mjs", functionalOutDir]));
   assertOk("validate genesis config strict", run(["scripts/validate-config.mjs", "--input", "assets/examples/genesis-config.json", "--mode", "genesis", "--strict"]));
   assertOk("validate repo config strict", run(["scripts/validate-config.mjs", "--input", "assets/examples/repo-config.json", "--mode", "repo", "--strict"]));
   const invalidConfigPath = join(temp, "invalid-config.json");
@@ -235,6 +256,7 @@ try {
   console.log("OK SKILL.md workflow sections");
   assertFileIncludes("SKILL.md has ai-skill-maker name", join(repoRoot, "SKILL.md"), "name: ai-skill-maker");
   assertFileIncludes("openai metadata uses ai-skill-maker", join(repoRoot, "agents", "openai.yaml"), "Use $ai-skill-maker");
+  assertFileIncludes("SKILL.md links render-skill", join(repoRoot, "SKILL.md"), "scripts/render-skill.mjs");
   for (const modeFile of [
     "functional-skill.md",
     "document-template-skill.md",
