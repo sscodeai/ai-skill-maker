@@ -235,6 +235,16 @@ try {
   console.log("OK SKILL.md workflow sections");
   assertFileIncludes("SKILL.md has ai-skill-maker name", join(repoRoot, "SKILL.md"), "name: ai-skill-maker");
   assertFileIncludes("openai metadata uses ai-skill-maker", join(repoRoot, "agents", "openai.yaml"), "Use $ai-skill-maker");
+  for (const modeFile of [
+    "functional-skill.md",
+    "document-template-skill.md",
+    "workflow-automation-skill.md",
+    "project-maintainer-skill.md",
+    "adapter-instruction-bundle.md",
+  ]) {
+    assertFileIncludes(`SKILL.md links ${modeFile}`, join(repoRoot, "SKILL.md"), `references/modes/${modeFile}`);
+    assertFileIncludes(`mode file exists ${modeFile}`, join(repoRoot, "references", "modes", modeFile), "# ");
+  }
   assertFileIncludes("SKILL.md links forward tests", join(repoRoot, "SKILL.md"), "references/evals/forward-tests.md");
   assertFileIncludes("forward tests include genesis prompt", join(repoRoot, "references", "evals", "forward-tests.md"), "## Genesis Mode Prompt");
   assertFileIncludes("forward tests include repo prompt", join(repoRoot, "references", "evals", "forward-tests.md"), "## Repo Mode Prompt");
