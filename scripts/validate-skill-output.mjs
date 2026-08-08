@@ -50,12 +50,14 @@ if (existsSync(skillPath)) {
 }
 
 const markdownFiles = allFiles.filter((file) => file.endsWith(".md"));
+const labelPattern = /(observed_fact|declared_intent|recommended_standard|inferred_assumption):/;
 for (const file of markdownFiles) {
   const text = readFileSync(file, "utf8");
   const rel = relative(dir, file);
   const begins = (text.match(/BEGIN USER RULES/g) || []).length;
   const ends = (text.match(/END USER RULES/g) || []).length;
   if (rel !== "SKILL.md" && !text.includes("Evidence Ledger")) errors.push(`${rel} missing Evidence Ledger`);
+  if (rel !== "SKILL.md" && !labelPattern.test(text)) errors.push(`${rel} missing evidence labels`);
   if (begins !== 1 || ends !== 1) errors.push(`${rel} must contain exactly one USER RULES block`);
 }
 

@@ -7,6 +7,14 @@ const here = dirname(fileURLToPath(import.meta.url));
 const skillRoot = dirname(here);
 const defaultTemplate = join(skillRoot, "assets", "templates", "skill");
 const examplesDir = join(skillRoot, "assets", "examples");
+const initConfigs = new Map([
+  ["functional", "functional-skill-config.json"],
+  ["presentation", "functional-skill-config.json"],
+  ["document", "document-skill-config.json"],
+  ["markdown", "document-skill-config.json"],
+  ["workflow", "workflow-skill-config.json"],
+  ["refresh", "refresh-skill-config.json"],
+]);
 
 function parseArgs(argv) {
   const args = {};
@@ -25,7 +33,7 @@ function parseArgs(argv) {
 function usage() {
   console.log(`Usage:
   node scripts/render-skill.mjs --input config.json --output <skill-dir> [--template <dir>]
-  node scripts/render-skill.mjs --init-config functional`);
+  node scripts/render-skill.mjs --init-config functional|document|workflow|refresh`);
 }
 
 function slugify(value) {
@@ -96,11 +104,11 @@ function preserveManualBlock(next, previous) {
 const args = parseArgs(process.argv);
 if (args.initConfig) {
   const mode = String(args.initConfig).toLowerCase();
-  if (!["functional"].includes(mode)) {
-    console.error("--init-config must be one of: functional");
+  if (!initConfigs.has(mode)) {
+    console.error(`--init-config must be one of: ${[...initConfigs.keys()].join(", ")}`);
     process.exit(1);
   }
-  console.log(readFileSync(join(examplesDir, "functional-skill-config.json"), "utf8"));
+  console.log(readFileSync(join(examplesDir, initConfigs.get(mode)), "utf8"));
   process.exit(0);
 }
 

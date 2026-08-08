@@ -109,14 +109,18 @@ try {
   }
   console.log("OK enriched repo signals shape");
   assertOk("print schema", run(["scripts/render-project-skill.mjs", "--print-schema"]));
-  const functionalConfig = run(["scripts/render-skill.mjs", "--init-config", "functional"]);
-  assertOk("init functional skill config", functionalConfig);
-  JSON.parse(functionalConfig.stdout);
   const functionalConfigPath = join(temp, "functional-skill-config.json");
-  writeFileSync(functionalConfigPath, functionalConfig.stdout);
   const functionalOutDir = join(temp, "functional-skill");
-  assertOk("render functional skill", run(["scripts/render-skill.mjs", "--input", functionalConfigPath, "--output", functionalOutDir]));
-  assertOk("validate functional skill", run(["scripts/validate-skill-output.mjs", functionalOutDir]));
+  for (const mode of ["functional", "document", "workflow", "refresh"]) {
+    const config = run(["scripts/render-skill.mjs", "--init-config", mode]);
+    assertOk(`init ${mode} skill config`, config);
+    JSON.parse(config.stdout);
+    const configPath = mode === "functional" ? functionalConfigPath : join(temp, `${mode}-skill-config.json`);
+    writeFileSync(configPath, config.stdout);
+    const outDir = mode === "functional" ? functionalOutDir : join(temp, `${mode}-skill`);
+    assertOk(`render ${mode} skill`, run(["scripts/render-skill.mjs", "--input", configPath, "--output", outDir]));
+    assertOk(`validate ${mode} skill`, run(["scripts/validate-skill-output.mjs", outDir]));
+  }
   const functionalIntentPath = join(functionalOutDir, "references", "skill-intent.md");
   const functionalKeep = "- declared_intent: Preserve this functional skill user rule.";
   const functionalIntent = readFileSync(functionalIntentPath, "utf8");

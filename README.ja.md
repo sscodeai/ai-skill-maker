@@ -65,6 +65,8 @@ node scripts/render-skill.mjs --input config.json --output ./generated-skill
 node scripts/validate-skill-output.mjs ./generated-skill
 ```
 
+starter config は `functional`、`document`、`workflow`、`refresh` に対応しています。
+
 repository signals を収集します。
 
 ```bash
