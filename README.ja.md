@@ -95,6 +95,12 @@ node scripts/self-check.mjs
 node scripts/self-check.mjs --check-installed
 ```
 
+fresh session で評価するための forward-test prompts は次にあります。
+
+```text
+references/evals/forward-tests.md
+```
+
 ローカルの Codex personal skill を install または sync します。
 
 ```bash

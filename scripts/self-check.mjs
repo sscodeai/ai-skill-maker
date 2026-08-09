@@ -276,9 +276,10 @@ try {
     assertFileIncludes(`mode file exists ${modeFile}`, join(repoRoot, "references", "modes", modeFile), "# ");
   }
   assertFileIncludes("SKILL.md links forward tests", join(repoRoot, "SKILL.md"), "references/evals/forward-tests.md");
-  assertFileIncludes("forward tests include genesis prompt", join(repoRoot, "references", "evals", "forward-tests.md"), "## Genesis Mode Prompt");
-  assertFileIncludes("forward tests include repo prompt", join(repoRoot, "references", "evals", "forward-tests.md"), "## Repo Mode Prompt");
-  assertFileIncludes("forward tests include refresh prompt", join(repoRoot, "references", "evals", "forward-tests.md"), "## Refresh Workflow Prompt");
+  assertFileIncludes("forward tests include functional prompt", join(repoRoot, "references", "evals", "forward-tests.md"), "## Functional Skill Prompt");
+  assertFileIncludes("forward tests include document prompt", join(repoRoot, "references", "evals", "forward-tests.md"), "## Document Skill Prompt");
+  assertFileIncludes("forward tests include workflow prompt", join(repoRoot, "references", "evals", "forward-tests.md"), "## Workflow Skill Prompt");
+  assertFileIncludes("forward tests include existing skill refresh prompt", join(repoRoot, "references", "evals", "forward-tests.md"), "## Existing Skill Refresh Prompt");
 
   const installed = process.env.HOME ? join(process.env.HOME, ".codex", "skills", "ai-skill-maker") : null;
   if (checkInstalled && installed && existsSync(installed)) {

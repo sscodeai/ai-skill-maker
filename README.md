@@ -95,6 +95,12 @@ node scripts/self-check.mjs
 node scripts/self-check.mjs --check-installed
 ```
 
+Forward-test prompts for fresh-session evaluation live in:
+
+```text
+references/evals/forward-tests.md
+```
+
 Install or sync the local Codex personal skill:
 
 ```bash
