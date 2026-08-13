@@ -2,6 +2,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync, copyFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+import { formatSkillConfigValidation, validateSkillConfig } from "./validate-skill-config.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const skillRoot = dirname(here);
@@ -24,6 +25,7 @@ function parseArgs(argv) {
     else if (arg === "--output") args.output = argv[++i];
     else if (arg === "--template") args.template = argv[++i];
     else if (arg === "--init-config") args.initConfig = argv[++i];
+    else if (arg === "--strict") args.strict = true;
     else if (arg === "--help") args.help = true;
     else throw new Error(`Unknown argument: ${arg}`);
   }
@@ -32,7 +34,7 @@ function parseArgs(argv) {
 
 function usage() {
   console.log(`Usage:
-  node scripts/render-skill.mjs --input config.json --output <skill-dir> [--template <dir>]
+  node scripts/render-skill.mjs --input config.json --output <skill-dir> [--template <dir>] [--strict]
   node scripts/render-skill.mjs --init-config functional|document|workflow|refresh`);
 }
 
@@ -118,6 +120,14 @@ if (args.help || !args.input || !args.output) {
 }
 
 const config = JSON.parse(readFileSync(args.input, "utf8"));
+const validation = validateSkillConfig(config, { strict: args.strict });
+if (!validation.ok) {
+  console.error(formatSkillConfigValidation(validation, args.input));
+  process.exit(1);
+}
+if (validation.warnings.length) {
+  console.error(formatSkillConfigValidation({ ...validation, ok: true, errors: [] }, args.input));
+}
 config.skillName = slugify(config.skillName || config.displayName || "ai-skill");
 const template = args.template || defaultTemplate;
 mkdirSync(args.output, { recursive: true });

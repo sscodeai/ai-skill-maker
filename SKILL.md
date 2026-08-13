@@ -73,7 +73,8 @@ Use the shared output contract before emitting adapter-specific files.
 - `scripts/draft-project-config.mjs --repo <repo>`: draft a repo-mode render config from collected repository signals.
 - `scripts/render-adapter.mjs --input config.json --adapter agents|claude|cursor|copilot --output <repo-root-or-file> [--force]`: render platform-specific instruction files while preserving marked generated blocks.
 - `scripts/validate-config.mjs --input config.json [--mode genesis|repo] [--strict]`: check config shape, evidence labels, strict-mode coverage, and repo-mode observed fact citations.
-- `scripts/render-skill.mjs --input config.json --output <skill-dir> [--template <dir>]`: render or refresh a general generated skill while preserving manual blocks.
+- `scripts/validate-skill-config.mjs --input config.json [--strict]`: check general skill config shape, required strict fields, and evidence labels.
+- `scripts/render-skill.mjs --input config.json --output <skill-dir> [--template <dir>] [--strict]`: render or refresh a general generated skill while preserving manual blocks.
 - `scripts/validate-skill-output.mjs <skill-dir>`: verify required generated skill files, metadata, evidence ledgers, and manual preservation markers.
 - `scripts/render-project-skill.mjs --input config.json --output <skill-dir> [--template <dir>] [--strict]`: current compatibility renderer for project maintainer skills while general skill rendering is added.
 - `scripts/validate-project-skill.mjs <skill-dir>`: current compatibility validator for generated project maintainer skill folders.

@@ -117,10 +117,15 @@ try {
     JSON.parse(config.stdout);
     const configPath = mode === "functional" ? functionalConfigPath : join(temp, `${mode}-skill-config.json`);
     writeFileSync(configPath, config.stdout);
+    assertOk(`validate ${mode} skill config strict`, run(["scripts/validate-skill-config.mjs", "--input", configPath, "--strict"]));
     const outDir = mode === "functional" ? functionalOutDir : join(temp, `${mode}-skill`);
-    assertOk(`render ${mode} skill`, run(["scripts/render-skill.mjs", "--input", configPath, "--output", outDir]));
+    assertOk(`render ${mode} skill`, run(["scripts/render-skill.mjs", "--input", configPath, "--output", outDir, "--strict"]));
     assertOk(`validate ${mode} skill`, run(["scripts/validate-skill-output.mjs", outDir]));
   }
+  const emptySkillConfigPath = join(temp, "empty-skill-config.json");
+  writeFileSync(emptySkillConfigPath, "{}");
+  assertFailIncludes("empty skill config fails strict", run(["scripts/validate-skill-config.mjs", "--input", emptySkillConfigPath, "--strict"]), "skillName is required");
+  assertFailIncludes("render skill strict rejects empty config", run(["scripts/render-skill.mjs", "--input", emptySkillConfigPath, "--output", join(temp, "empty-skill"), "--strict"]), "Skill config validation failed");
   const functionalIntentPath = join(functionalOutDir, "references", "skill-intent.md");
   const functionalKeep = "- declared_intent: Preserve this functional skill user rule.";
   const functionalIntent = readFileSync(functionalIntentPath, "utf8");
@@ -131,7 +136,7 @@ try {
       `<!-- BEGIN USER RULES -->\n${functionalKeep}\n<!-- END USER RULES -->`
     )
   );
-  assertOk("refresh functional skill", run(["scripts/render-skill.mjs", "--input", functionalConfigPath, "--output", functionalOutDir]));
+  assertOk("refresh functional skill", run(["scripts/render-skill.mjs", "--input", functionalConfigPath, "--output", functionalOutDir, "--strict"]));
   assertFileIncludes("functional skill preserves user rules", functionalIntentPath, functionalKeep);
   assertOk("validate refreshed functional skill", run(["scripts/validate-skill-output.mjs", functionalOutDir]));
   assertOk("validate genesis config strict", run(["scripts/validate-config.mjs", "--input", "assets/examples/genesis-config.json", "--mode", "genesis", "--strict"]));
@@ -262,6 +267,7 @@ try {
   assertFileIncludes("SKILL.md routes project validator", join(repoRoot, "SKILL.md"), "validate project maintainer compatibility outputs with `scripts/validate-project-skill.mjs`");
   assertFileIncludes("SKILL.md has ai-skill-maker name", join(repoRoot, "SKILL.md"), "name: ai-skill-maker");
   assertFileIncludes("openai metadata uses ai-skill-maker", join(repoRoot, "agents", "openai.yaml"), "Use $ai-skill-maker");
+  assertFileIncludes("SKILL.md links validate-skill-config", join(repoRoot, "SKILL.md"), "scripts/validate-skill-config.mjs");
   assertFileIncludes("SKILL.md links render-skill", join(repoRoot, "SKILL.md"), "scripts/render-skill.mjs");
   for (const checklist of ["functional-skill-intake.md", "existing-skill-scan.md", "refresh-skill.md"]) {
     assertFileIncludes(`SKILL.md links ${checklist}`, join(repoRoot, "SKILL.md"), `references/checklists/${checklist}`);

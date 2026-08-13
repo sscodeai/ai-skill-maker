@@ -61,7 +61,8 @@ JSON config から general functional skill を生成します。
 
 ```bash
 node scripts/render-skill.mjs --init-config functional > config.json
-node scripts/render-skill.mjs --input config.json --output ./generated-skill
+node scripts/validate-skill-config.mjs --input config.json --strict
+node scripts/render-skill.mjs --input config.json --output ./generated-skill --strict
 node scripts/validate-skill-output.mjs ./generated-skill
 ```
 
