@@ -258,6 +258,8 @@ try {
     process.exit(1);
   }
   console.log("OK SKILL.md workflow sections");
+  assertFileIncludes("SKILL.md routes general validator", join(repoRoot, "SKILL.md"), "Validate general skill outputs with `scripts/validate-skill-output.mjs`");
+  assertFileIncludes("SKILL.md routes project validator", join(repoRoot, "SKILL.md"), "validate project maintainer compatibility outputs with `scripts/validate-project-skill.mjs`");
   assertFileIncludes("SKILL.md has ai-skill-maker name", join(repoRoot, "SKILL.md"), "name: ai-skill-maker");
   assertFileIncludes("openai metadata uses ai-skill-maker", join(repoRoot, "agents", "openai.yaml"), "Use $ai-skill-maker");
   assertFileIncludes("SKILL.md links render-skill", join(repoRoot, "SKILL.md"), "scripts/render-skill.mjs");

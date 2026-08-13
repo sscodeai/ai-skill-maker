@@ -32,8 +32,8 @@ If the mode is ambiguous, infer it from available artifacts. Ask only when the c
 4. Choose applicable standards. Initial scaffold keeps project maintainer standards from the source project and will add general skill standards in later revisions.
 5. Choose output adapters. Default to a Codex-compatible skill folder or platform-neutral instruction bundle; read adapter references only when requested.
 6. Validate finished configs with `scripts/validate-config.mjs --strict` when the output is meant to be durable rather than a rough draft.
-7. Render general functional skills with `scripts/render-skill.mjs`; use the project-maintainer compatibility renderer only for project maintainer outputs.
-8. Validate the rendered output with `scripts/validate-project-skill.mjs`. Run platform-specific compatibility checks when relevant.
+7. Render general skills with `scripts/render-skill.mjs`; use `scripts/render-project-skill.mjs` only for project maintainer compatibility outputs.
+8. Validate general skill outputs with `scripts/validate-skill-output.mjs`; validate project maintainer compatibility outputs with `scripts/validate-project-skill.mjs`. Run platform-specific compatibility checks when relevant.
 9. Report the final path, generated files, preserved user areas, validation result, and suggested invocation prompt.
 
 For forward-testing this maker itself in a fresh session, read `references/evals/forward-tests.md`.
@@ -51,7 +51,7 @@ Do not stuff detailed domain rules into the generated `SKILL.md`; put durable de
 
 ## Config Inputs
 
-Read `references/config-schema.md` before writing or editing a render config. Use `assets/examples/functional-skill-config.json` for a general functional skill starter, or the project-maintainer examples for compatibility outputs.
+Read `references/config-schema.md` before writing or editing a render config. Use `assets/examples/functional-skill-config.json` for a general functional skill starter, or the project-maintainer examples for compatibility outputs. Match the validator to the renderer: `validate-skill-output.mjs` for `render-skill.mjs`, and `validate-project-skill.mjs` for `render-project-skill.mjs`.
 
 ## Adapters
 

@@ -18,9 +18,11 @@ Before delivering a generated AI skill or instruction bundle:
 Run:
 
 ```bash
-node scripts/validate-skill-output.mjs <output-skill-dir>
-node scripts/validate-project-skill.mjs <output-skill-dir>
+node scripts/validate-skill-output.mjs <general-skill-dir>
+node scripts/validate-project-skill.mjs <project-maintainer-skill-dir>
 ```
+
+Use `validate-skill-output.mjs` for outputs from `render-skill.mjs`. Use `validate-project-skill.mjs` only for project maintainer compatibility outputs from `render-project-skill.mjs`.
 
 For Codex skill compatibility, optionally run the skill-creator validator after installing `PyYAML` in the Python environment:
 
