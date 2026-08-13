@@ -89,7 +89,13 @@ function valueFor(config, key) {
 }
 
 function render(text, config) {
-  return text.replace(/\{\{([a-zA-Z0-9_]+)\}\}/g, (_, key) => valueFor(config, key));
+  return text
+    .replace(/\{\{yaml:([a-zA-Z0-9_]+)\}\}/g, (_, key) => yamlString(valueFor(config, key)))
+    .replace(/\{\{([a-zA-Z0-9_]+)\}\}/g, (_, key) => valueFor(config, key));
+}
+
+function yamlString(value) {
+  return JSON.stringify(String(value ?? ""));
 }
 
 function manualBlock(text) {

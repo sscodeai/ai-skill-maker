@@ -56,12 +56,24 @@ if (existsSync(skillPath)) {
   const fm = skill.match(/^---\n([\s\S]*?)\n---/);
   if (!fm) errors.push("SKILL.md is missing YAML frontmatter");
   else {
-    const keys = fm[1].split("\n").map((line) => line.split(":")[0].trim()).filter(Boolean);
+    const lines = fm[1].split("\n").filter((line) => line.trim());
+    const keys = lines.map((line) => line.split(":")[0].trim()).filter(Boolean);
     for (const key of keys) {
       if (!["name", "description"].includes(key)) errors.push(`SKILL.md frontmatter has unsupported key: ${key}`);
     }
     if (!keys.includes("name")) errors.push("SKILL.md frontmatter missing name");
     if (!keys.includes("description")) errors.push("SKILL.md frontmatter missing description");
+    for (const line of lines) {
+      const match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
+      if (!match) {
+        errors.push(`SKILL.md frontmatter has invalid line: ${line}`);
+        continue;
+      }
+      const value = match[2].trim();
+      if (value.includes(": ") && !/^(['"]).*\1$/.test(value)) {
+        errors.push(`SKILL.md frontmatter value for ${match[1]} must be quoted when it contains ": "`);
+      }
+    }
   }
 }
 

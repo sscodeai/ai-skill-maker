@@ -126,6 +126,14 @@ try {
   writeFileSync(emptySkillConfigPath, "{}");
   assertFailIncludes("empty skill config fails strict", run(["scripts/validate-skill-config.mjs", "--input", emptySkillConfigPath, "--strict"]), "skillName is required");
   assertFailIncludes("render skill strict rejects empty config", run(["scripts/render-skill.mjs", "--input", emptySkillConfigPath, "--output", join(temp, "empty-skill"), "--strict"]), "Skill config validation failed");
+  const yamlSkillConfigPath = join(temp, "yaml-skill-config.json");
+  const yamlSkillConfig = JSON.parse(readFileSync(functionalConfigPath, "utf8"));
+  yamlSkillConfig.skillDescription = "Create: reports for users";
+  writeFileSync(yamlSkillConfigPath, JSON.stringify(yamlSkillConfig, null, 2));
+  const yamlSkillOutDir = join(temp, "yaml-skill");
+  assertOk("render yaml-safe skill description", run(["scripts/render-skill.mjs", "--input", yamlSkillConfigPath, "--output", yamlSkillOutDir, "--strict"]));
+  assertFileIncludes("yaml-safe skill description quoted", join(yamlSkillOutDir, "SKILL.md"), 'description: "Create: reports for users"');
+  assertOk("validate yaml-safe skill", run(["scripts/validate-skill-output.mjs", yamlSkillOutDir]));
   const functionalIntentPath = join(functionalOutDir, "references", "skill-intent.md");
   const functionalKeep = "- declared_intent: Preserve this functional skill user rule.";
   const functionalIntent = readFileSync(functionalIntentPath, "utf8");
@@ -268,6 +276,10 @@ try {
   assertFileIncludes("SKILL.md has ai-skill-maker name", join(repoRoot, "SKILL.md"), "name: ai-skill-maker");
   assertFileIncludes("openai metadata uses ai-skill-maker", join(repoRoot, "agents", "openai.yaml"), "Use $ai-skill-maker");
   assertFileIncludes("SKILL.md links validate-skill-config", join(repoRoot, "SKILL.md"), "scripts/validate-skill-config.mjs");
+  assertFileIncludes("SKILL.md links skill config schema", join(repoRoot, "SKILL.md"), "references/skill-config-schema.md");
+  assertFileIncludes("SKILL.md links project config schema", join(repoRoot, "SKILL.md"), "references/project-config-schema.md");
+  assertFileIncludes("config schema points to skill schema", join(repoRoot, "references", "config-schema.md"), "references/skill-config-schema.md");
+  assertFileIncludes("config schema points to project schema", join(repoRoot, "references", "config-schema.md"), "references/project-config-schema.md");
   assertFileIncludes("SKILL.md links render-skill", join(repoRoot, "SKILL.md"), "scripts/render-skill.mjs");
   for (const checklist of ["functional-skill-intake.md", "existing-skill-scan.md", "refresh-skill.md"]) {
     assertFileIncludes(`SKILL.md links ${checklist}`, join(repoRoot, "SKILL.md"), `references/checklists/${checklist}`);

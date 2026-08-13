@@ -1,6 +1,6 @@
 ---
 name: {{skillName}}
-description: Maintain {{projectName}} as a project-specific AI maintainer skill. Use when an AI coding agent needs to understand this project's intent, architecture, coding standards, content style, workflows, generated files, verification commands, releases, or long-term maintenance conventions before making or reviewing changes.
+description: {{yaml:projectSkillDescription}}
 ---
 
 # {{projectName}} Maintainer

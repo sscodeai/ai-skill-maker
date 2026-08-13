@@ -66,7 +66,7 @@ node scripts/render-skill.mjs --input config.json --output ./generated-skill --s
 node scripts/validate-skill-output.mjs ./generated-skill
 ```
 
-starter config は `functional`、`document`、`workflow`、`refresh` に対応しています。
+starter config は `functional`、`document`、`workflow`、`refresh` に対応しています。general skill configs は `references/skill-config-schema.md`、project maintainer compatibility configs は `references/project-config-schema.md` を参照してください。
 
 `render-skill.mjs` の出力には `validate-skill-output.mjs` を使います。`validate-project-skill.mjs` は `render-project-skill.mjs` で生成した互換 project-maintainer output 専用です。
 

@@ -1,6 +1,6 @@
 ---
 name: {{skillName}}
-description: {{skillDescription}}
+description: {{yaml:skillDescription}}
 ---
 
 # {{displayName}}

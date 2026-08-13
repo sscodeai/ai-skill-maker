@@ -51,7 +51,7 @@ Do not stuff detailed domain rules into the generated `SKILL.md`; put durable de
 
 ## Config Inputs
 
-Read `references/config-schema.md` before writing or editing a render config. Use `assets/examples/functional-skill-config.json` for a general functional skill starter, or the project-maintainer examples for compatibility outputs. Match the validator to the renderer: `validate-skill-output.mjs` for `render-skill.mjs`, and `validate-project-skill.mjs` for `render-project-skill.mjs`.
+Read `references/config-schema.md` first, then `references/skill-config-schema.md` for general skill configs or `references/project-config-schema.md` for project maintainer compatibility configs. Use `assets/examples/functional-skill-config.json` for a general functional skill starter, or the project-maintainer examples for compatibility outputs. Match the validator to the renderer: `validate-skill-output.mjs` for `render-skill.mjs`, and `validate-project-skill.mjs` for `render-project-skill.mjs`.
 
 ## Adapters
 

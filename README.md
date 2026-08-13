@@ -66,7 +66,7 @@ node scripts/render-skill.mjs --input config.json --output ./generated-skill --s
 node scripts/validate-skill-output.mjs ./generated-skill
 ```
 
-Starter configs are available for `functional`, `document`, `workflow`, and `refresh`.
+Starter configs are available for `functional`, `document`, `workflow`, and `refresh`. See `references/skill-config-schema.md` for general skill configs and `references/project-config-schema.md` for project maintainer compatibility configs.
 
 Use `validate-skill-output.mjs` for outputs from `render-skill.mjs`. Use `validate-project-skill.mjs` only for compatibility project-maintainer outputs from `render-project-skill.mjs`.
 
