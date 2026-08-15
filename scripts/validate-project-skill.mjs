@@ -32,6 +32,46 @@ function walk(path, out = []) {
   return out;
 }
 
+function parseYamlScalar(value) {
+  const text = value.trim();
+  if (!text) return { ok: false, error: "empty value" };
+  if (text.startsWith('"')) {
+    try {
+      const parsed = JSON.parse(text);
+      return typeof parsed === "string" ? { ok: true } : { ok: false, error: "not a string" };
+    } catch {
+      return { ok: false, error: "invalid quoted string" };
+    }
+  }
+  if (text.startsWith("'")) {
+    if (!/^'(?:[^']|'')*'$/.test(text)) return { ok: false, error: "invalid quoted string" };
+    return { ok: true };
+  }
+  if (text.includes(": ") || text.includes('"') || text.includes("'")) {
+    return { ok: false, error: "unquoted unsafe string" };
+  }
+  return { ok: true };
+}
+
+function yamlKeyValues(text) {
+  const map = new Map();
+  const yamlErrors = [];
+  for (const line of text.split("\n").filter((item) => item.trim())) {
+    const match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
+    if (!match) {
+      yamlErrors.push(`invalid YAML line: ${line}`);
+      continue;
+    }
+    map.set(match[1], match[2]);
+  }
+  return { map, yamlErrors };
+}
+
+function yamlValueForKey(text, key) {
+  const match = text.match(new RegExp(`^\\s*${key}:\\s*(.+)$`, "m"));
+  return match ? match[1].trim() : null;
+}
+
 const errors = [];
 const allFiles = walk(dir);
 const templateFiles = allFiles.filter((file) => /\{\{[a-zA-Z0-9_]+\}\}/.test(readFileSync(file, "utf8")));
@@ -56,23 +96,17 @@ if (existsSync(skillPath)) {
   const fm = skill.match(/^---\n([\s\S]*?)\n---/);
   if (!fm) errors.push("SKILL.md is missing YAML frontmatter");
   else {
-    const lines = fm[1].split("\n").filter((line) => line.trim());
-    const keys = lines.map((line) => line.split(":")[0].trim()).filter(Boolean);
+    const { map, yamlErrors } = yamlKeyValues(fm[1]);
+    for (const error of yamlErrors) errors.push(`SKILL.md frontmatter has ${error}`);
+    const keys = [...map.keys()];
     for (const key of keys) {
       if (!["name", "description"].includes(key)) errors.push(`SKILL.md frontmatter has unsupported key: ${key}`);
     }
     if (!keys.includes("name")) errors.push("SKILL.md frontmatter missing name");
     if (!keys.includes("description")) errors.push("SKILL.md frontmatter missing description");
-    for (const line of lines) {
-      const match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
-      if (!match) {
-        errors.push(`SKILL.md frontmatter has invalid line: ${line}`);
-        continue;
-      }
-      const value = match[2].trim();
-      if (value.includes(": ") && !/^(['"]).*\1$/.test(value)) {
-        errors.push(`SKILL.md frontmatter value for ${match[1]} must be quoted when it contains ": "`);
-      }
+    for (const [key, value] of map) {
+      const parsed = parseYamlScalar(value);
+      if (!parsed.ok) errors.push(`SKILL.md frontmatter value for ${key} is invalid YAML: ${parsed.error}`);
     }
   }
 }
@@ -98,7 +132,14 @@ const openaiPath = join(dir, "agents/openai.yaml");
 if (existsSync(openaiPath)) {
   const openai = readFileSync(openaiPath, "utf8");
   for (const key of ["display_name", "short_description", "default_prompt"]) {
-    if (!new RegExp(`${key}:\\s+".+"`).test(openai)) errors.push(`agents/openai.yaml missing quoted ${key}`);
+    const value = yamlValueForKey(openai, key);
+    if (!value) {
+      errors.push(`agents/openai.yaml missing quoted ${key}`);
+      continue;
+    }
+    if (!/^["']/.test(value)) errors.push(`agents/openai.yaml ${key} must be quoted`);
+    const parsed = parseYamlScalar(value);
+    if (!parsed.ok) errors.push(`agents/openai.yaml ${key} is invalid YAML: ${parsed.error}`);
   }
 }
 

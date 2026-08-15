@@ -136,11 +136,16 @@ try {
   const yamlSkillConfigPath = join(temp, "yaml-skill-config.json");
   const yamlSkillConfig = JSON.parse(readFileSync(functionalConfigPath, "utf8"));
   yamlSkillConfig.skillDescription = "Create: reports for users";
+  yamlSkillConfig.shortDescription = 'Create "quoted" reports';
+  yamlSkillConfig.defaultTask = 'create "quoted" reports';
   writeFileSync(yamlSkillConfigPath, JSON.stringify(yamlSkillConfig, null, 2));
   const yamlSkillOutDir = join(temp, "yaml-skill");
   assertOk("render yaml-safe skill description", run(["scripts/render-skill.mjs", "--input", yamlSkillConfigPath, "--output", yamlSkillOutDir, "--strict"]));
   assertFileIncludes("yaml-safe skill description quoted", join(yamlSkillOutDir, "SKILL.md"), 'description: "Create: reports for users"');
+  assertFileIncludes("yaml-safe skill metadata quoted", join(yamlSkillOutDir, "agents", "openai.yaml"), 'short_description: "Create \\"quoted\\" reports"');
   assertOk("validate yaml-safe skill", run(["scripts/validate-skill-output.mjs", yamlSkillOutDir]));
+  writeFileSync(join(yamlSkillOutDir, "agents", "openai.yaml"), 'interface:\n  display_name: "Quoted Skill"\n  short_description: "Create "quoted" reports"\n  default_prompt: "Use the skill."\n');
+  assertFailIncludes("broken skill metadata YAML fails", run(["scripts/validate-skill-output.mjs", yamlSkillOutDir]), "invalid quoted string");
   const functionalIntentPath = join(functionalOutDir, "references", "skill-intent.md");
   const functionalKeep = "- declared_intent: Preserve this functional skill user rule.";
   const functionalIntent = readFileSync(functionalIntentPath, "utf8");
@@ -267,6 +272,19 @@ try {
     assertOk(`render ${mode} output`, run(["scripts/render-project-skill.mjs", "--input", configPath, "--output", outDir, "--strict"]));
     assertOk(`validate ${mode} output`, run(["scripts/validate-project-skill.mjs", outDir]));
   }
+
+  const yamlProjectConfigPath = join(temp, "yaml-project.json");
+  const yamlProjectConfig = JSON.parse(run(["scripts/render-project-skill.mjs", "--init-config", "genesis"]).stdout);
+  yamlProjectConfig.projectName = 'Quoted: "Project"';
+  yamlProjectConfig.shortDescription = 'Maintain "quoted" project';
+  writeFileSync(yamlProjectConfigPath, JSON.stringify(yamlProjectConfig, null, 2));
+  const yamlProjectOutDir = join(temp, "yaml-maintainer");
+  assertOk("render yaml-safe project output", run(["scripts/render-project-skill.mjs", "--input", yamlProjectConfigPath, "--output", yamlProjectOutDir, "--strict"]));
+  assertFileIncludes("yaml-safe project frontmatter quoted", join(yamlProjectOutDir, "SKILL.md"), 'description: "Maintain Quoted: \\"Project\\"');
+  assertFileIncludes("yaml-safe project metadata quoted", join(yamlProjectOutDir, "agents", "openai.yaml"), 'short_description: "Maintain \\"quoted\\" project"');
+  assertOk("validate yaml-safe project output", run(["scripts/validate-project-skill.mjs", yamlProjectOutDir]));
+  writeFileSync(join(yamlProjectOutDir, "agents", "openai.yaml"), 'interface:\n  display_name: "Quoted Project"\n  short_description: "Maintain "quoted" project"\n  default_prompt: "Use the project skill."\n');
+  assertFailIncludes("broken project metadata YAML fails", run(["scripts/validate-project-skill.mjs", yamlProjectOutDir]), "invalid quoted string");
 
   const refreshConfigPath = join(temp, "refresh.json");
   const refreshConfig = run(["scripts/render-project-skill.mjs", "--init-config", "genesis"]);

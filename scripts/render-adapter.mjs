@@ -45,6 +45,10 @@ function footer() {
   return "<!-- END AI-PROJECT-SKILL-MAKER -->\n";
 }
 
+function yamlString(value) {
+  return JSON.stringify(String(value ?? ""));
+}
+
 function generatedBlockPattern() {
   return /(?:---\n[\s\S]*?\n---\n\n)?<!-- BEGIN AI-PROJECT-SKILL-MAKER -->[\s\S]*?<!-- END AI-PROJECT-SKILL-MAKER -->\n?/;
 }
@@ -77,7 +81,7 @@ function renderCopilot(config) {
 
 function renderCursor(config) {
   return `---
-description: Project-wide AI coding rules for ${config.projectName || "this project"}
+description: ${yamlString(`Project-wide AI coding rules for ${config.projectName || "this project"}`)}
 alwaysApply: true
 ---
 

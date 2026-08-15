@@ -1,4 +1,4 @@
 interface:
-  display_name: "{{projectName}} Maintainer"
-  short_description: "{{shortDescription}}"
-  default_prompt: "Use ${{skillName}} to make a well-verified change to this project."
+  display_name: {{yaml:projectDisplayName}}
+  short_description: {{yaml:shortDescription}}
+  default_prompt: {{yaml:defaultPrompt}}

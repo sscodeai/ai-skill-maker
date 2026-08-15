@@ -1,4 +1,4 @@
 interface:
-  display_name: "{{displayName}}"
-  short_description: "{{shortDescription}}"
-  default_prompt: "Use ${{skillName}} to {{defaultTask}}."
+  display_name: {{yaml:displayName}}
+  short_description: {{yaml:shortDescription}}
+  default_prompt: {{yaml:defaultPrompt}}
