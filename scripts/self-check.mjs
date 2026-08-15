@@ -156,6 +156,8 @@ try {
   mkdirSync(join(yamlSkillOutDir, "assets"), { recursive: true });
   writeFileSync(join(yamlSkillOutDir, "assets", "sample-report.md"), "# {{title}}\n\nMarkdown asset without skill evidence blocks.\n");
   assertOk("validate skill output with markdown asset template", run(["scripts/validate-skill-output.mjs", yamlSkillOutDir]));
+  writeFileSync(join(yamlSkillOutDir, "agents", "openai.yaml"), 'display_name: "Quoted Skill"\nshort_description: "Create quoted reports"\ndefault_prompt: "Use the skill."\n');
+  assertFailIncludes("skill metadata outside interface fails", run(["scripts/validate-skill-output.mjs", yamlSkillOutDir]), "missing interface section");
   writeFileSync(join(yamlSkillOutDir, "agents", "openai.yaml"), 'interface:\n  display_name: "Quoted Skill"\n  short_description: "Create "quoted" reports"\n  default_prompt: "Use the skill."\n');
   assertFailIncludes("broken skill metadata YAML fails", run(["scripts/validate-skill-output.mjs", yamlSkillOutDir]), "invalid quoted string");
   const functionalIntentPath = join(functionalOutDir, "references", "skill-intent.md");
@@ -340,6 +342,8 @@ try {
   mkdirSync(join(yamlProjectOutDir, "assets"), { recursive: true });
   writeFileSync(join(yamlProjectOutDir, "assets", "sample-template.md"), "# {{title}}\n\nTemplate asset without maintainer evidence blocks.\n");
   assertOk("validate project output with markdown asset template", run(["scripts/validate-project-skill.mjs", yamlProjectOutDir]));
+  writeFileSync(join(yamlProjectOutDir, "agents", "openai.yaml"), 'display_name: "Quoted Project"\nshort_description: "Maintain quoted project"\ndefault_prompt: "Use the project skill."\n');
+  assertFailIncludes("project metadata outside interface fails", run(["scripts/validate-project-skill.mjs", yamlProjectOutDir]), "missing interface section");
   writeFileSync(join(yamlProjectOutDir, "agents", "openai.yaml"), 'interface:\n  display_name: "Quoted Project"\n  short_description: "Maintain "quoted" project"\n  default_prompt: "Use the project skill."\n');
   assertFailIncludes("broken project metadata YAML fails", run(["scripts/validate-project-skill.mjs", yamlProjectOutDir]), "invalid quoted string");
 

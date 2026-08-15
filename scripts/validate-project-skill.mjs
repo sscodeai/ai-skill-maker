@@ -67,9 +67,25 @@ function yamlKeyValues(text) {
   return { map, yamlErrors };
 }
 
-function yamlValueForKey(text, key) {
-  const match = text.match(new RegExp(`^\\s*${key}:\\s*(.+)$`, "m"));
-  return match ? match[1].trim() : null;
+function hasInterfaceSection(text) {
+  return /^interface:\s*$/m.test(text);
+}
+
+function interfaceValueForKey(text, key) {
+  const lines = text.split("\n");
+  let inInterface = false;
+  for (const line of lines) {
+    if (/^interface:\s*$/.test(line)) {
+      inInterface = true;
+      continue;
+    }
+    if (!inInterface) continue;
+    if (!line.trim()) continue;
+    if (!/^\s+/.test(line)) break;
+    const match = line.match(new RegExp(`^\\s+${key}:\\s*(.+)$`));
+    if (match) return match[1].trim();
+  }
+  return null;
 }
 
 const errors = [];
@@ -139,8 +155,9 @@ for (const file of refs) {
 const openaiPath = join(dir, "agents/openai.yaml");
 if (existsSync(openaiPath)) {
   const openai = readFileSync(openaiPath, "utf8");
+  if (!hasInterfaceSection(openai)) errors.push("agents/openai.yaml missing interface section");
   for (const key of ["display_name", "short_description", "default_prompt"]) {
-    const value = yamlValueForKey(openai, key);
+    const value = interfaceValueForKey(openai, key);
     if (!value) {
       errors.push(`agents/openai.yaml missing quoted ${key}`);
       continue;
