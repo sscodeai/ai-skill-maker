@@ -101,6 +101,9 @@ const scripts = signals.package?.scripts || {};
 const readmes = signals.files?.readmes || [];
 const primaryReadme = readmes.find((file) => /^readme\.md$/i.test(file)) || readmes[0];
 const docs = signals.files?.docs || [];
+const skillFiles = signals.files?.skillFiles || [];
+const scriptFiles = signals.files?.scriptFiles || [];
+const primarySkillFile = skillFiles.includes("SKILL.md") ? "SKILL.md" : skillFiles[0];
 const ci = signals.files?.ci || [];
 const configs = signals.files?.configs || [];
 const testFiles = signals.files?.testFiles || [];
@@ -144,6 +147,7 @@ const config = {
   projectPurpose: lines(
     [
       primaryReadme ? observed(primaryReadme, "is the primary project overview source.") : null,
+      !primaryReadme && primarySkillFile ? observed(primarySkillFile, "is the primary AI skill instruction source.") : null,
       signals.package?.name ? observed("package.json", `names the package \`${signals.package.name}\`.`) : null,
       bullet("declared_intent", "Confirm product purpose and non-goals with the maintainer."),
     ],
@@ -184,6 +188,7 @@ const config = {
   importantPaths: lines(
     [
       ...readmes.map((f) => observed(f, "is a README or overview file.")),
+      ...skillFiles.slice(0, 16).map((f) => observed(f, "is part of the AI skill source structure.")),
       ...sourceRoots.map((f) => observed(f, "is a top-level source/content/public root.")),
       ...testFiles.slice(0, 12).map((f) => observed(f, "is a detected test file.")),
       ...docs.slice(0, 12).map((f) => observed(f, "is a documentation or content path.")),
@@ -197,6 +202,8 @@ const config = {
       signals.package ? observed("package.json", "defines package metadata, scripts, exports, dependencies, or binary entry points.") : null,
       signals.package?.exports ? observed("package.json", "defines package exports.") : null,
       signals.package?.bin ? observed("package.json", "defines CLI binary entry points.") : null,
+      skillFiles.includes("SKILL.md") ? observed("SKILL.md", "is the Codex skill entry instruction file.") : null,
+      skillFiles.includes("agents/openai.yaml") ? observed("agents/openai.yaml", "defines OpenAI agent interface metadata.") : null,
       ...configs.slice(0, 12).map((f) => observed(f, "is a detected framework, build, test, lint, or docs config.")),
     ],
     bullet("inferred_assumption", "Entry points should be confirmed by inspecting source files.")
@@ -213,6 +220,7 @@ const config = {
       frameworkHints.astro ? observed("astro.config.*", "or dependencies indicate an Astro project.") : null,
       typeScriptEvidence(),
       frameworkHints.node ? observed("package.json", "indicates a Node/package-managed project.") : null,
+      frameworkHints.skillRepo ? observed("SKILL.md", "and `agents/openai.yaml` indicate an AI skill repository.") : null,
       frameworkHints.docsHeavy ? bullet("inferred_assumption", "Docs root, content, or docs framework signals indicate a documentation-heavy project.") : null,
       frameworkHints.hasReadme && !frameworkHints.docsHeavy ? bullet("inferred_assumption", "README signals exist, but docs-heavy project structure was not detected.") : null,
       frameworkVersionEvidence(),
@@ -279,6 +287,7 @@ const config = {
   verificationCommands: lines(
     [
       ...scriptBullets(scripts),
+      scriptFiles.includes("scripts/self-check.mjs") ? observed("scripts/self-check.mjs", "is the repository health check script.") : null,
       scriptsByCategory.test?.length ? bullet("observed_fact", `Test scripts detected: ${scriptsByCategory.test.map((name) => `\`${name}\``).join(", ")}.`) : null,
       scriptsByCategory.build?.length ? bullet("observed_fact", `Build scripts detected: ${scriptsByCategory.build.map((name) => `\`${name}\``).join(", ")}.`) : null,
       scriptsByCategory.lint?.length ? bullet("observed_fact", `Lint scripts detected: ${scriptsByCategory.lint.map((name) => `\`${name}\``).join(", ")}.`) : null,
@@ -321,6 +330,7 @@ const config = {
   evidenceLedger: lines(
     [
       primaryReadme ? observed(primaryReadme, "was detected as a README source.") : null,
+      primarySkillFile ? observed(primarySkillFile, "was detected as an AI skill source file.") : null,
       signals.package ? observed("package.json", "was detected as package metadata.") : null,
       ci.length ? bullet("observed_fact", `CI files detected: ${ci.map((f) => `\`${f}\``).join(", ")}.`) : null,
       agentInstructionFiles.length ? bullet("observed_fact", `Existing assistant instruction files detected: ${agentInstructionFiles.map((f) => `\`${f}\``).join(", ")}.`) : null,

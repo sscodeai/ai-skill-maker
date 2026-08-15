@@ -105,11 +105,14 @@ try {
   if (
     !parsedSignals.tooling?.scriptsByCategory ||
     !parsedSignals.files?.agentInstructionFiles ||
+    !parsedSignals.files?.skillFiles?.includes("SKILL.md") ||
+    !parsedSignals.files?.scriptFiles?.includes("scripts/self-check.mjs") ||
     !parsedSignals.files?.testFiles ||
     !parsedSignals.files?.typeScriptFiles ||
     !parsedSignals.files?.skippedDirs ||
     typeof parsedSignals.frameworkHints?.hasReadme !== "boolean" ||
-    typeof parsedSignals.frameworkHints?.docsHeavy !== "boolean"
+    typeof parsedSignals.frameworkHints?.docsHeavy !== "boolean" ||
+    parsedSignals.frameworkHints?.skillRepo !== true
   ) {
     console.error("FAIL enriched repo signals shape");
     process.exit(1);

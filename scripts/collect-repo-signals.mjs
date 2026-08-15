@@ -102,6 +102,13 @@ const pkg = exists("package.json") ? safeJson(join(repo, "package.json")) : null
 const lockfiles = ["package-lock.json", "npm-shrinkwrap.json", "pnpm-lock.yaml", "yarn.lock", "bun.lockb", "bun.lock"].filter(exists);
 const readmes = files.filter((f) => /^readme(\.|$)/i.test(f));
 const docs = files.filter((f) => /^(docs|documentation)\//i.test(f) || /^src\/content\//i.test(f)).slice(0, 80);
+const skillFiles = files.filter((f) =>
+  f === "SKILL.md" ||
+  f === "agents/openai.yaml" ||
+  /^references\/.+\.md$/i.test(f) ||
+  /^assets\/(examples|templates)\//i.test(f)
+).slice(0, 120);
+const scriptFiles = files.filter((f) => /^scripts\/.+\.(mjs|js|ts)$/i.test(f)).slice(0, 120);
 const ci = files.filter((f) => /^\.github\/workflows\//.test(f) || /(^|\/)(circleci|gitlab-ci|buildkite|azure-pipelines)/i.test(f));
 const testFiles = files.filter((f) =>
   /(^|\/)(__tests__|tests?|spec|e2e)\//i.test(f) ||
@@ -117,7 +124,7 @@ const agentInstructionFiles = files.filter((f) =>
   /^\.cursor\/rules\//.test(f) ||
   /^\.github\/copilot-instructions\.md$/i.test(f)
 ).slice(0, 80);
-const sourceRoots = ["src", "app", "packages", "lib", "bin", "cli", "content", "public"].filter(exists);
+const sourceRoots = ["src", "app", "packages", "lib", "bin", "cli", "content", "public", "references", "agents", "assets", "scripts"].filter(exists);
 const generatedHints = files.filter((f) =>
   /(^|\/)(dist|build|coverage|generated|__snapshots__|snapshots|schema|schemas|vendor|vendored)\//i.test(f) ||
   /\.(snap|lock|generated\.[cm]?[jt]s|d\.ts)$/.test(f)
@@ -154,6 +161,8 @@ const signals = {
   files: {
     readmes,
     docs,
+    skillFiles,
+    scriptFiles,
     ci,
     configs,
     testFiles,
@@ -190,6 +199,7 @@ const signals = {
     node: Boolean(pkg),
     hasReadme: readmes.length > 0,
     docsHeavy: docs.length >= 3 || hasDocsRoot || hasDocsFramework,
+    skillRepo: exists("SKILL.md") && exists("agents/openai.yaml"),
   },
   recentCommits,
 };
