@@ -116,7 +116,10 @@ function manualBlock(text) {
 function preserveManualBlock(next, previous) {
   const block = manualBlock(previous);
   if (block === null) return next;
-  return next.replace(/<!-- BEGIN USER RULES -->[\s\S]*?<!-- END USER RULES -->/, `<!-- BEGIN USER RULES -->${block}<!-- END USER RULES -->`);
+  return next.replace(
+    /<!-- BEGIN USER RULES -->[\s\S]*?<!-- END USER RULES -->/,
+    () => `<!-- BEGIN USER RULES -->${block}<!-- END USER RULES -->`
+  );
 }
 
 const args = parseArgs(process.argv);

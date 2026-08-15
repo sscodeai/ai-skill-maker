@@ -153,13 +153,13 @@ try {
   writeFileSync(join(yamlSkillOutDir, "agents", "openai.yaml"), 'interface:\n  display_name: "Quoted Skill"\n  short_description: "Create "quoted" reports"\n  default_prompt: "Use the skill."\n');
   assertFailIncludes("broken skill metadata YAML fails", run(["scripts/validate-skill-output.mjs", yamlSkillOutDir]), "invalid quoted string");
   const functionalIntentPath = join(functionalOutDir, "references", "skill-intent.md");
-  const functionalKeep = "- declared_intent: Preserve this functional skill user rule.";
+  const functionalKeep = "- declared_intent: Preserve this functional skill user rule with $& and $$ literally.";
   const functionalIntent = readFileSync(functionalIntentPath, "utf8");
   writeFileSync(
     functionalIntentPath,
     functionalIntent.replace(
       "<!-- BEGIN USER RULES -->\n<!-- Add durable skill-specific rules here. This block is preserved on refresh. -->\n<!-- END USER RULES -->",
-      `<!-- BEGIN USER RULES -->\n${functionalKeep}\n<!-- END USER RULES -->`
+      () => `<!-- BEGIN USER RULES -->\n${functionalKeep}\n<!-- END USER RULES -->`
     )
   );
   assertOk("refresh functional skill", run(["scripts/render-skill.mjs", "--input", functionalConfigPath, "--output", functionalOutDir, "--strict"]));
@@ -336,7 +336,7 @@ try {
   assertOk("init refresh config", refreshConfig);
   writeFileSync(refreshConfigPath, refreshConfig.stdout);
   const refreshOutDir = join(temp, "refresh-maintainer");
-  const preservedRule = "- declared_intent: Preserve this self-check user rule.";
+  const preservedRule = "- declared_intent: Preserve this self-check user rule with $& and $$ literally.";
   const intentPath = join(refreshOutDir, "references", "project-intent.md");
   assertOk("render refresh output first pass", run(["scripts/render-project-skill.mjs", "--input", refreshConfigPath, "--output", refreshOutDir]));
   const intent = readFileSync(intentPath, "utf8");
@@ -344,7 +344,7 @@ try {
     intentPath,
     intent.replace(
       "<!-- BEGIN USER RULES -->\n<!-- Add durable project-specific rules here. This block is preserved on refresh. -->\n<!-- END USER RULES -->",
-      `<!-- BEGIN USER RULES -->\n${preservedRule}\n<!-- END USER RULES -->`
+      () => `<!-- BEGIN USER RULES -->\n${preservedRule}\n<!-- END USER RULES -->`
     )
   );
   assertOk("render refresh output second pass", run(["scripts/render-project-skill.mjs", "--input", refreshConfigPath, "--output", refreshOutDir]));
