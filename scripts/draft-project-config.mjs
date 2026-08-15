@@ -38,7 +38,8 @@ function slugify(value) {
 }
 
 function collectSignals(repo) {
-  const result = spawnSync(process.execPath, ["scripts/collect-repo-signals.mjs", repo], {
+  const repoPath = resolve(repo);
+  const result = spawnSync(process.execPath, ["scripts/collect-repo-signals.mjs", repoPath], {
     cwd: repoRoot,
     encoding: "utf8",
   });
@@ -127,6 +128,14 @@ function typeScriptEvidence() {
   return bullet("inferred_assumption", "TypeScript is hinted by tooling, but the exact source file should be confirmed.");
 }
 
+function frameworkVersionEvidence() {
+  const entries = Object.entries(frameworkVersions);
+  if (!entries.length) return null;
+  const versions = entries.map(([name, version]) => `\`${name}@${version}\``).join(", ");
+  if (signals.package) return observed("package.json", `indicates framework/tool versions: ${versions}.`);
+  return bullet("inferred_assumption", `Detected framework/tool versions without a source file citation: ${versions}.`);
+}
+
 const config = {
   skillName: `${slugify(projectName)}-maintainer`,
   projectName,
@@ -205,7 +214,7 @@ const config = {
       frameworkHints.node ? observed("package.json", "indicates a Node/package-managed project.") : null,
       frameworkHints.docsHeavy ? bullet("inferred_assumption", "Docs root, content, or docs framework signals indicate a documentation-heavy project.") : null,
       frameworkHints.hasReadme && !frameworkHints.docsHeavy ? bullet("inferred_assumption", "README signals exist, but docs-heavy project structure was not detected.") : null,
-      Object.keys(frameworkVersions).length ? bullet("observed_fact", `Detected framework/tool versions: ${Object.entries(frameworkVersions).map(([name, version]) => `\`${name}@${version}\``).join(", ")}.`) : null,
+      frameworkVersionEvidence(),
     ],
     bullet("inferred_assumption", "System shape needs direct architecture inspection.")
   ),
