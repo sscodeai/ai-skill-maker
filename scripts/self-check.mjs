@@ -20,6 +20,13 @@ function run(args, options = {}) {
   return result;
 }
 
+function runScriptFrom(cwd, args) {
+  return spawnSync(process.execPath, [join(repoRoot, args[0]), ...args.slice(1)], {
+    cwd,
+    encoding: "utf8",
+  });
+}
+
 function assertOk(label, result) {
   if (result.status !== 0) {
     console.error(`FAIL ${label}`);
@@ -230,6 +237,22 @@ try {
   }
   console.log("OK ts-only draft does not cite missing tsconfig");
   assertOk("ts-only draft validates strict", run(["scripts/validate-config.mjs", "--input", tsOnlyConfigPath, "--mode", "repo", "--strict"]));
+
+  const relativeRepo = join(temp, "relative-repo");
+  mkdirSync(join(relativeRepo, "src"), { recursive: true });
+  writeFileSync(join(relativeRepo, "package.json"), JSON.stringify({
+    name: "relative-target",
+    scripts: { build: "tsc" },
+    devDependencies: { typescript: "^5.5.0" },
+  }, null, 2));
+  writeFileSync(join(relativeRepo, "src", "index.ts"), "export const value: number = 1;\n");
+  const relativeDraft = runScriptFrom(relativeRepo, ["scripts/draft-project-config.mjs", "--repo", "."]);
+  assertOk("draft relative repo path", relativeDraft);
+  const relativeConfigPath = join(temp, "relative-config.json");
+  writeFileSync(relativeConfigPath, relativeDraft.stdout);
+  assertFileIncludes("relative draft uses target package", relativeConfigPath, "\"projectName\": \"relative-target\"");
+  assertFileIncludes("relative draft cites package versions", relativeConfigPath, "`package.json` indicates framework/tool versions");
+  assertOk("relative draft validates strict", run(["scripts/validate-config.mjs", "--input", relativeConfigPath, "--mode", "repo", "--strict"]));
 
   const rawTemplate = run(["scripts/validate-project-skill.mjs", "assets/templates/project-skill"]);
   assertFailIncludes("raw template validation fails clearly", rawTemplate, "Render it first");
