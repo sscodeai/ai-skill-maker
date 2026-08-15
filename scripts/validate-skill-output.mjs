@@ -60,7 +60,10 @@ function yamlValueForKey(text, key) {
 
 const errors = [];
 const allFiles = walk(dir);
-const templateFiles = allFiles.filter((file) => /\{\{[a-zA-Z0-9_]+\}\}/.test(readFileSync(file, "utf8")));
+const templateFiles = allFiles.filter((file) => {
+  const rel = relative(dir, file);
+  return !rel.startsWith("assets/") && /\{\{[a-zA-Z0-9_:]+\}\}/.test(readFileSync(file, "utf8"));
+});
 
 if (templateFiles.length) {
   console.error("AI skill validation failed:");
@@ -95,7 +98,12 @@ if (existsSync(skillPath)) {
   if (!skill.includes("## Workflow")) errors.push("SKILL.md missing Workflow section");
 }
 
-const markdownFiles = allFiles.filter((file) => file.endsWith(".md"));
+function isInstructionMarkdown(file) {
+  const rel = relative(dir, file);
+  return rel === "SKILL.md" || rel.startsWith("references/");
+}
+
+const markdownFiles = allFiles.filter((file) => file.endsWith(".md") && isInstructionMarkdown(file));
 const labelPattern = /(observed_fact|declared_intent|recommended_standard|inferred_assumption):/;
 for (const file of markdownFiles) {
   const text = readFileSync(file, "utf8");
