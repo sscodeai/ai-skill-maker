@@ -325,8 +325,12 @@ try {
   assertFileIncludes("SKILL.md links validate-skill-config", join(repoRoot, "SKILL.md"), "scripts/validate-skill-config.mjs");
   assertFileIncludes("SKILL.md links skill config schema", join(repoRoot, "SKILL.md"), "references/skill-config-schema.md");
   assertFileIncludes("SKILL.md links project config schema", join(repoRoot, "SKILL.md"), "references/project-config-schema.md");
+  assertFileIncludes("SKILL.md user block is skill-specific", join(repoRoot, "SKILL.md"), "durable skill-specific rules");
   assertFileIncludes("config schema points to skill schema", join(repoRoot, "references", "config-schema.md"), "references/skill-config-schema.md");
   assertFileIncludes("config schema points to project schema", join(repoRoot, "references", "config-schema.md"), "references/project-config-schema.md");
+  assertFileIncludes("refresh workflow is general", join(repoRoot, "references", "workflows", "refresh.md"), "existing AI skill or instruction bundle");
+  assertFileIncludes("refresh workflow routes general validator", join(repoRoot, "references", "workflows", "refresh.md"), "validate-skill-output.mjs");
+  assertFileIncludes("refresh workflow limits project validator", join(repoRoot, "references", "workflows", "refresh.md"), "only for project maintainer compatibility outputs");
   assertFileIncludes("SKILL.md links render-skill", join(repoRoot, "SKILL.md"), "scripts/render-skill.mjs");
   for (const checklist of ["functional-skill-intake.md", "existing-skill-scan.md", "refresh-skill.md"]) {
     assertFileIncludes(`SKILL.md links ${checklist}`, join(repoRoot, "SKILL.md"), `references/checklists/${checklist}`);

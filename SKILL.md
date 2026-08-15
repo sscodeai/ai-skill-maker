@@ -29,7 +29,7 @@ If the mode is ambiguous, infer it from available artifacts. Ask only when the c
    - For new functional skills, interview for examples, triggering language, artifacts, reusable resources, validation, and platform targets.
    - For project maintainer outputs, interview or scan the repo according to genesis/repo mode.
 3. Separate every claim into one of: observed facts, declared user intent, recommended standards, inferred assumptions. Read `references/rules/evidence-vs-recommendation.md`.
-4. Choose applicable standards. Initial scaffold keeps project maintainer standards from the source project and will add general skill standards in later revisions.
+4. Choose applicable standards for the selected skill type, artifact type, workflow, assistant platform, and verification needs.
 5. Choose output adapters. Default to a Codex-compatible skill folder or platform-neutral instruction bundle; read adapter references only when requested.
 6. Validate finished configs with `scripts/validate-config.mjs --strict` when the output is meant to be durable rather than a rough draft.
 7. Render general skills with `scripts/render-skill.mjs`; use `scripts/render-project-skill.mjs` only for project maintainer compatibility outputs.
@@ -84,5 +84,5 @@ Use the shared output contract before emitting adapter-specific files.
 Read scripts only when debugging or changing behavior; they are designed to run directly.
 
 <!-- BEGIN USER RULES -->
-<!-- Add durable project-specific rules here. This block is preserved on refresh. -->
+<!-- Add durable skill-specific rules here. This block is preserved on refresh. -->
 <!-- END USER RULES -->
