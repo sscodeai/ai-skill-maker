@@ -172,6 +172,7 @@ try {
   assertFailIncludes("null config fails clearly", run(["scripts/validate-config.mjs", "--input", nullConfigPath, "--strict"]), "Config must be a JSON object");
   const weakCitationConfigPath = join(temp, "weak-citation-config.json");
   const weakCitationConfig = {
+    mode: "repo",
     projectName: "Weak Citation",
     projectPurpose: "- observed_fact: `notapath` claims a fact.",
     audience: "- declared_intent: Confirm audience.",
@@ -188,6 +189,25 @@ try {
   };
   writeFileSync(weakCitationConfigPath, JSON.stringify(weakCitationConfig, null, 2));
   assertFailIncludes("weak observed citation fails clearly", run(["scripts/validate-config.mjs", "--input", weakCitationConfigPath, "--mode", "repo", "--strict"]), "should cite a source path");
+  const noObservedRepoConfigPath = join(temp, "no-observed-repo-config.json");
+  const noObservedRepoConfig = {
+    mode: "repo",
+    projectName: "No Observed Repo",
+    projectPurpose: "- declared_intent: Maintain this repository.",
+    audience: "- declared_intent: Confirm audience.",
+    constraints: "- declared_intent: Confirm constraints.",
+    maintenanceGoals: "- declared_intent: Confirm maintenance goals.",
+    importantPaths: "- declared_intent: Confirm important paths.",
+    entryPoints: "- declared_intent: Confirm entry points.",
+    systemShape: "- declared_intent: Confirm architecture.",
+    stylePatterns: "- recommended_standard: Follow existing style.",
+    verificationCommands: "- declared_intent: Confirm verification.",
+    generatedOutput: "- declared_intent: Confirm generated files.",
+    editRestrictions: "- recommended_standard: Confirm before generated-file edits.",
+    evidenceLedger: "- declared_intent: Repo config should not pass without observed facts.\n- recommended_standard: Repo mode requires source-backed facts.",
+  };
+  writeFileSync(noObservedRepoConfigPath, JSON.stringify(noObservedRepoConfig, null, 2));
+  assertFailIncludes("render strict honors repo mode", run(["scripts/render-project-skill.mjs", "--input", noObservedRepoConfigPath, "--output", join(temp, "no-observed-repo"), "--strict"]), "Repo strict mode requires at least one observed_fact");
   const draftedConfig = run(["scripts/draft-project-config.mjs", "--repo", "."]);
   assertOk("draft repo config", draftedConfig);
   JSON.parse(draftedConfig.stdout);

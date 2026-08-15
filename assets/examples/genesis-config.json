@@ -1,4 +1,5 @@
 {
+  "mode": "genesis",
   "skillName": "new-docs-site-maintainer",
   "projectName": "New Docs Site",
   "shortDescription": "Maintain a new documentation site",

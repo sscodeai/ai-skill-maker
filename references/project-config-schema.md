@@ -6,6 +6,7 @@ The config is intentionally plain JSON so AI agents and humans can edit it witho
 
 ## Required Fields
 
+- `mode`: `genesis` or `repo`. Strict renderers use this to apply the correct validation semantics.
 - `projectName`: Human-facing project name.
 
 ## Recommended Fields

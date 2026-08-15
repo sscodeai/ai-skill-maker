@@ -137,6 +137,7 @@ function frameworkVersionEvidence() {
 }
 
 const config = {
+  mode: "repo",
   skillName: `${slugify(projectName)}-maintainer`,
   projectName,
   shortDescription: `Maintain ${projectName}`,

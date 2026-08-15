@@ -29,6 +29,7 @@ const repoRootNames = new Set([
 ]);
 
 const knownFields = new Set([
+  "mode",
   "skillName",
   "projectName",
   "shortDescription",
@@ -147,6 +148,7 @@ function looksLikeRepoPath(value) {
 
 function inferMode(config, explicitMode) {
   if (explicitMode) return explicitMode;
+  if (config.mode) return config.mode;
   const text = allText(config);
   if (text.includes("observed_fact:")) return "repo";
   if (text.includes("declared_intent:")) return "genesis";
@@ -171,8 +173,8 @@ export function validateConfig(config, options = {}) {
     errors.push("skillName must use lowercase letters, digits, and hyphens, starting with a letter or digit, up to 63 characters.");
   }
 
-  if (options.mode && !["genesis", "repo"].includes(options.mode)) {
-    errors.push("--mode must be one of: genesis, repo.");
+  if (mode && !["genesis", "repo"].includes(mode)) {
+    errors.push("mode must be one of: genesis, repo.");
   }
 
   for (const field of Object.keys(config)) {

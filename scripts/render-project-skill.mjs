@@ -17,6 +17,7 @@ function parseArgs(argv) {
     if (arg === "--input") args.input = argv[++i];
     else if (arg === "--output") args.output = argv[++i];
     else if (arg === "--template") args.template = argv[++i];
+    else if (arg === "--mode") args.mode = argv[++i];
     else if (arg === "--init-config") args.initConfig = argv[++i];
     else if (arg === "--print-schema") args.printSchema = true;
     else if (arg === "--strict") args.strict = true;
@@ -28,7 +29,7 @@ function parseArgs(argv) {
 
 function usage() {
   console.log(`Usage:
-  node scripts/render-project-skill.mjs --input config.json --output <skill-dir> [--template <dir>] [--strict]
+  node scripts/render-project-skill.mjs --input config.json --output <skill-dir> [--template <dir>] [--mode genesis|repo] [--strict]
   node scripts/render-project-skill.mjs --init-config genesis|repo
   node scripts/render-project-skill.mjs --print-schema`);
 }
@@ -140,7 +141,7 @@ if (args.help || !args.input || !args.output) {
 }
 
 const config = JSON.parse(readFileSync(args.input, "utf8"));
-const validation = validateConfig(config, { strict: args.strict });
+const validation = validateConfig(config, { mode: args.mode || config.mode, strict: args.strict });
 if (!validation.ok) {
   console.error(formatValidation(validation, args.input));
   process.exit(1);

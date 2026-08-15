@@ -1,4 +1,5 @@
 {
+  "mode": "repo",
   "skillName": "example-repo-maintainer",
   "projectName": "Example Repo",
   "shortDescription": "Maintain an existing TypeScript repo",
