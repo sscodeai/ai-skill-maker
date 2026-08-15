@@ -33,7 +33,6 @@ function compact(value) {
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean)
-    .slice(0, 8)
     .join("\n");
 }
 

@@ -229,6 +229,13 @@ try {
   for (const adapter of ["agents", "claude", "cursor", "copilot"]) {
     assertOk(`render ${adapter} adapter`, run(["scripts/render-adapter.mjs", "--input", adapterConfigPath, "--adapter", adapter, "--output", join(temp, "adapters")]));
   }
+  const longAdapterConfigPath = join(temp, "long-adapter-config.json");
+  const longAdapterConfig = JSON.parse(readFileSync(adapterConfigPath, "utf8"));
+  longAdapterConfig.importantPaths = Array.from({ length: 10 }, (_, index) => `- observed_fact: \`path-${index}.md\` is an important path.`).join("\n");
+  longAdapterConfig.entryPoints = "- observed_fact: `entry-point.md` must survive adapter rendering.";
+  writeFileSync(longAdapterConfigPath, JSON.stringify(longAdapterConfig, null, 2));
+  assertOk("render long adapter without truncation", run(["scripts/render-adapter.mjs", "--input", longAdapterConfigPath, "--adapter", "agents", "--output", join(temp, "long-adapter")]));
+  assertFileIncludes("adapter keeps merged entry points", join(temp, "long-adapter", "AGENTS.md"), "`entry-point.md` must survive adapter rendering.");
   const agentsPath = join(temp, "adapters", "AGENTS.md");
   const existingAgents = readFileSync(agentsPath, "utf8");
   const keepText = "USER KEEP: adapter refresh should preserve this section.";
