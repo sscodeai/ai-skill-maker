@@ -370,6 +370,11 @@ try {
       process.exit(1);
     }
     console.log("OK installed skill payload matches repo");
+    assertOk("installed install script is self-safe", spawnSync(process.execPath, ["scripts/install-local-skill.mjs"], {
+      cwd: installed,
+      encoding: "utf8",
+    }));
+    assertFileIncludes("installed skill survived self-install", join(installed, "SKILL.md"), "name: ai-skill-maker");
   } else if (checkInstalled) {
     console.log("SKIP installed skill check");
   }

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { existsSync, mkdirSync, readdirSync, rmSync, statSync, copyFileSync, renameSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, rmSync, statSync, copyFileSync, renameSync, realpathSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -58,16 +58,20 @@ if (args.help) {
 
 const installDir = join(args.skillsDir, "ai-skill-maker");
 mkdirSync(args.skillsDir, { recursive: true });
-rmSync(installDir, { recursive: true, force: true });
-mkdirSync(installDir, { recursive: true });
-for (const name of skillPayload) {
-  const sourcePath = join(repoRoot, name);
-  if (!existsSync(sourcePath)) continue;
-  const destPath = join(installDir, name);
-  const stats = statSync(sourcePath);
-  if (stats.isDirectory()) copyDir(sourcePath, destPath);
-  else copyFileSync(sourcePath, destPath);
+
+const sourceIsInstallDir = existsSync(installDir) && realpathSync(installDir) === realpathSync(repoRoot);
+if (!sourceIsInstallDir) {
+  rmSync(installDir, { recursive: true, force: true });
+  mkdirSync(installDir, { recursive: true });
+  for (const name of skillPayload) {
+    const sourcePath = join(repoRoot, name);
+    if (!existsSync(sourcePath)) continue;
+    const destPath = join(installDir, name);
+    const stats = statSync(sourcePath);
+    if (stats.isDirectory()) copyDir(sourcePath, destPath);
+    else copyFileSync(sourcePath, destPath);
+  }
 }
 
-console.log(`Installed ${relative(process.cwd(), installDir) || installDir}`);
+console.log(`${sourceIsInstallDir ? "Already installed" : "Installed"} ${relative(process.cwd(), installDir) || installDir}`);
 console.log(`Payload: ${skillPayload.join(", ")}`);
