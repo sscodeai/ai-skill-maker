@@ -107,6 +107,10 @@ function isNonEmptyString(value) {
   return typeof value === "string" && value.trim().length > 0;
 }
 
+function isRenderableValue(value) {
+  return value === undefined || value === null || typeof value === "string" || (Array.isArray(value) && value.every((item) => typeof item === "string"));
+}
+
 function fieldText(value) {
   if (Array.isArray(value)) return value.join("\n");
   if (typeof value === "string") return value;
@@ -192,6 +196,10 @@ export function validateConfig(config, options = {}) {
   }
 
   if (options.strict) {
+    for (const [field, value] of Object.entries(config)) {
+      if (!isRenderableValue(value)) errors.push(`${field} must be a string or an array of strings in strict mode.`);
+    }
+
     for (const field of strictFields) {
       if (!isNonEmptyString(fieldText(config[field]))) errors.push(`${field} is required in strict mode.`);
     }

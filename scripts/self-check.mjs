@@ -136,6 +136,12 @@ try {
   writeFileSync(emptySkillConfigPath, "{}");
   assertFailIncludes("empty skill config fails strict", run(["scripts/validate-skill-config.mjs", "--input", emptySkillConfigPath, "--strict"]), "skillName is required");
   assertFailIncludes("render skill strict rejects empty config", run(["scripts/render-skill.mjs", "--input", emptySkillConfigPath, "--output", join(temp, "empty-skill"), "--strict"]), "Skill config validation failed");
+  const objectSkillConfigPath = join(temp, "object-skill-config.json");
+  const objectSkillConfig = JSON.parse(readFileSync(functionalConfigPath, "utf8"));
+  objectSkillConfig.skillPurpose = { text: "- declared_intent: Object fields should not render." };
+  writeFileSync(objectSkillConfigPath, JSON.stringify(objectSkillConfig, null, 2));
+  assertFailIncludes("object skill config field fails strict", run(["scripts/validate-skill-config.mjs", "--input", objectSkillConfigPath, "--strict"]), "skillPurpose must be a string or an array of strings");
+  assertFailIncludes("render skill strict rejects object config field", run(["scripts/render-skill.mjs", "--input", objectSkillConfigPath, "--output", join(temp, "object-skill"), "--strict"]), "skillPurpose must be a string or an array of strings");
   const yamlSkillConfigPath = join(temp, "yaml-skill-config.json");
   const yamlSkillConfig = JSON.parse(readFileSync(functionalConfigPath, "utf8"));
   yamlSkillConfig.skillDescription = "Create: reports for users";
@@ -173,6 +179,12 @@ try {
   const nullConfigPath = join(temp, "null-config.json");
   writeFileSync(nullConfigPath, "null");
   assertFailIncludes("null config fails clearly", run(["scripts/validate-config.mjs", "--input", nullConfigPath, "--strict"]), "Config must be a JSON object");
+  const objectFieldConfigPath = join(temp, "object-field-config.json");
+  const objectFieldConfig = JSON.parse(readFileSync("assets/examples/repo-config.json", "utf8"));
+  objectFieldConfig.projectPurpose = { text: "- observed_fact: `README.md` should not render from an object." };
+  writeFileSync(objectFieldConfigPath, JSON.stringify(objectFieldConfig, null, 2));
+  assertFailIncludes("object project config field fails strict", run(["scripts/validate-config.mjs", "--input", objectFieldConfigPath, "--mode", "repo", "--strict"]), "projectPurpose must be a string or an array of strings");
+  assertFailIncludes("render project strict rejects object config field", run(["scripts/render-project-skill.mjs", "--input", objectFieldConfigPath, "--output", join(temp, "object-field"), "--strict"]), "projectPurpose must be a string or an array of strings");
   const weakCitationConfigPath = join(temp, "weak-citation-config.json");
   const weakCitationConfig = {
     mode: "repo",
