@@ -192,6 +192,15 @@ try {
   };
   writeFileSync(weakCitationConfigPath, JSON.stringify(weakCitationConfig, null, 2));
   assertFailIncludes("weak observed citation fails clearly", run(["scripts/validate-config.mjs", "--input", weakCitationConfigPath, "--mode", "repo", "--strict"]), "should cite a source path");
+  const bareRootCitationPath = join(temp, "bare-root-citation-config.json");
+  const bareRootCitationConfig = {
+    ...weakCitationConfig,
+    projectPurpose: "- observed_fact: `build` is a script name, not a source path.",
+    importantPaths: "- observed_fact: `README.md` is a source file.",
+    evidenceLedger: "- observed_fact: `README.md` is valid evidence.\n- declared_intent: Confirm maintainer intent.",
+  };
+  writeFileSync(bareRootCitationPath, JSON.stringify(bareRootCitationConfig, null, 2));
+  assertFailIncludes("bare repo root citation fails clearly", run(["scripts/validate-config.mjs", "--input", bareRootCitationPath, "--mode", "repo", "--strict"]), "should cite a source path");
   const noObservedRepoConfigPath = join(temp, "no-observed-repo-config.json");
   const noObservedRepoConfig = {
     mode: "repo",

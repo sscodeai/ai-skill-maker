@@ -138,10 +138,10 @@ function hasPathCitation(line) {
 }
 
 function looksLikeRepoPath(value) {
-  const text = String(value || "").trim().replace(/\/$/, "");
+  const raw = String(value || "").trim();
+  const text = raw.replace(/\/$/, "");
   if (!text || /\s/.test(text)) return false;
-  if (text.includes("/") || text.includes("*")) return true;
-  if (repoRootNames.has(text)) return true;
+  if (raw.includes("/") || text.includes("*")) return true;
   if (/^\.[\w.-]+$/.test(text)) return true;
   return /^[\w@.-]+\.[A-Za-z0-9*]+$/.test(text);
 }

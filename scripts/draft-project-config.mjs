@@ -139,6 +139,10 @@ function frameworkVersionEvidence() {
   return bullet("inferred_assumption", `Detected framework/tool versions without a source file citation: ${versions}.`);
 }
 
+function rootPath(name) {
+  return String(name).endsWith("/") ? String(name) : `${name}/`;
+}
+
 const config = {
   mode: "repo",
   skillName: `${slugify(projectName)}-maintainer`,
@@ -189,7 +193,7 @@ const config = {
     [
       ...readmes.map((f) => observed(f, "is a README or overview file.")),
       ...skillFiles.slice(0, 16).map((f) => observed(f, "is part of the AI skill source structure.")),
-      ...sourceRoots.map((f) => observed(f, "is a top-level source/content/public root.")),
+      ...sourceRoots.map((f) => observed(rootPath(f), "is a top-level source/content/public root.")),
       ...testFiles.slice(0, 12).map((f) => observed(f, "is a detected test file.")),
       ...docs.slice(0, 12).map((f) => observed(f, "is a documentation or content path.")),
       ...ci.map((f) => observed(f, "is a CI workflow or pipeline file.")),
@@ -244,7 +248,7 @@ const config = {
   ),
   stylePatterns: lines(
     [
-      sourceRoots.length ? bullet("observed_fact", `${sourceRoots.map((f) => `\`${f}\``).join(", ")} provide local style and organization signals.`) : null,
+      sourceRoots.length ? bullet("observed_fact", `${sourceRoots.map((f) => `\`${rootPath(f)}\``).join(", ")} provide local style and organization signals.`) : null,
       bullet("recommended_standard", "Follow existing local patterns before introducing new abstractions."),
     ],
     bullet("recommended_standard", "Follow existing local patterns before introducing new abstractions.")
@@ -288,10 +292,10 @@ const config = {
     [
       ...scriptBullets(scripts),
       scriptFiles.includes("scripts/self-check.mjs") ? observed("scripts/self-check.mjs", "is the repository health check script.") : null,
-      scriptsByCategory.test?.length ? bullet("observed_fact", `Test scripts detected: ${scriptsByCategory.test.map((name) => `\`${name}\``).join(", ")}.`) : null,
-      scriptsByCategory.build?.length ? bullet("observed_fact", `Build scripts detected: ${scriptsByCategory.build.map((name) => `\`${name}\``).join(", ")}.`) : null,
-      scriptsByCategory.lint?.length ? bullet("observed_fact", `Lint scripts detected: ${scriptsByCategory.lint.map((name) => `\`${name}\``).join(", ")}.`) : null,
-      scriptsByCategory.typecheck?.length ? bullet("observed_fact", `Typecheck scripts detected: ${scriptsByCategory.typecheck.map((name) => `\`${name}\``).join(", ")}.`) : null,
+      scriptsByCategory.test?.length ? observed("package.json", `defines test script names: ${scriptsByCategory.test.map((name) => `\`${name}\``).join(", ")}.`) : null,
+      scriptsByCategory.build?.length ? observed("package.json", `defines build script names: ${scriptsByCategory.build.map((name) => `\`${name}\``).join(", ")}.`) : null,
+      scriptsByCategory.lint?.length ? observed("package.json", `defines lint script names: ${scriptsByCategory.lint.map((name) => `\`${name}\``).join(", ")}.`) : null,
+      scriptsByCategory.typecheck?.length ? observed("package.json", `defines typecheck script names: ${scriptsByCategory.typecheck.map((name) => `\`${name}\``).join(", ")}.`) : null,
       Object.keys(scripts).length ? bullet("recommended_standard", "Use exact package scripts as the source of truth for available checks.") : null,
     ],
     bullet("inferred_assumption", "Verification commands need maintainer confirmation because no package scripts were detected.")
