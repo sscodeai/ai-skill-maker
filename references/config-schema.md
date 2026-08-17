@@ -8,12 +8,13 @@ Use `references/skill-config-schema.md` for outputs rendered with:
 
 ```bash
 node scripts/render-skill.mjs --input config.json --output <skill-dir> --strict
+node scripts/render-skill.mjs --print-schema
 ```
 
 Validate configs with:
 
 ```bash
-node scripts/validate-skill-config.mjs --input config.json --strict
+node scripts/validate-skill-config.mjs --input config.json --mode functional --strict
 ```
 
 ## Project Maintainer Compatibility Configs
@@ -22,6 +23,7 @@ Use `references/project-config-schema.md` for compatibility outputs rendered wit
 
 ```bash
 node scripts/render-project-skill.mjs --input config.json --output <skill-dir> --strict
+node scripts/render-project-skill.mjs --print-schema
 ```
 
 Validate configs with:

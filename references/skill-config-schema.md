@@ -8,7 +8,7 @@ The config is intentionally plain JSON. Most fields render directly into `SKILL.
 
 - `skillName`: Lowercase hyphen-case output skill name.
 - `displayName`: Human-facing skill display name.
-- `skillDescription`: Trigger-oriented description for generated `SKILL.md` frontmatter.
+- `skillDescription`: Trigger-oriented description for generated `SKILL.md` frontmatter. In strict mode, include explicit trigger wording such as `Use when`.
 - `shortDescription`: Short UI description for `agents/openai.yaml`.
 - `defaultTask`: Default prompt action after `Use $<skill-name> to`.
 - `skillPurpose`: Why the generated skill exists.
@@ -31,6 +31,7 @@ The config is intentionally plain JSON. Most fields render directly into `SKILL.
 
 ## Optional Fields
 
+- `mode`: Optional mode hint, one of `functional`, `document`, `workflow`, or `refresh`.
 - `edgeCases`: Ambiguous, high-risk, or unusual requests.
 - `failureHandling`: Recovery and reporting behavior when tools or assumptions fail.
 - `assetResources`: Reusable templates, examples, visual assets, fixtures, or boilerplate.
@@ -61,4 +62,5 @@ node scripts/render-skill.mjs --init-config functional
 node scripts/render-skill.mjs --init-config document
 node scripts/render-skill.mjs --init-config workflow
 node scripts/render-skill.mjs --init-config refresh
+node scripts/render-skill.mjs --print-schema
 ```

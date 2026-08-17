@@ -118,7 +118,20 @@ try {
     process.exit(1);
   }
   console.log("OK enriched repo signals shape");
-  assertOk("print schema", run(["scripts/render-project-skill.mjs", "--print-schema"]));
+  const skillSchema = run(["scripts/render-skill.mjs", "--print-schema"]);
+  assertOk("print general skill schema", skillSchema);
+  if (!skillSchema.stdout.includes("# Skill Config Schema")) {
+    console.error("FAIL general skill schema output");
+    process.exit(1);
+  }
+  console.log("OK general skill schema output");
+  const projectSchema = run(["scripts/render-project-skill.mjs", "--print-schema"]);
+  assertOk("print project schema", projectSchema);
+  if (!projectSchema.stdout.includes("# Project Config Schema")) {
+    console.error("FAIL project schema output");
+    process.exit(1);
+  }
+  console.log("OK project schema output");
   const functionalConfigPath = join(temp, "functional-skill-config.json");
   const functionalOutDir = join(temp, "functional-skill");
   for (const mode of ["functional", "document", "workflow", "refresh"]) {
@@ -127,9 +140,9 @@ try {
     JSON.parse(config.stdout);
     const configPath = mode === "functional" ? functionalConfigPath : join(temp, `${mode}-skill-config.json`);
     writeFileSync(configPath, config.stdout);
-    assertOk(`validate ${mode} skill config strict`, run(["scripts/validate-skill-config.mjs", "--input", configPath, "--strict"]));
+    assertOk(`validate ${mode} skill config strict`, run(["scripts/validate-skill-config.mjs", "--input", configPath, "--mode", mode, "--strict"]));
     const outDir = mode === "functional" ? functionalOutDir : join(temp, `${mode}-skill`);
-    assertOk(`render ${mode} skill`, run(["scripts/render-skill.mjs", "--input", configPath, "--output", outDir, "--strict"]));
+    assertOk(`render ${mode} skill`, run(["scripts/render-skill.mjs", "--input", configPath, "--output", outDir, "--mode", mode, "--strict"]));
     assertOk(`validate ${mode} skill`, run(["scripts/validate-skill-output.mjs", outDir]));
   }
   const emptySkillConfigPath = join(temp, "empty-skill-config.json");
@@ -144,13 +157,13 @@ try {
   assertFailIncludes("render skill strict rejects object config field", run(["scripts/render-skill.mjs", "--input", objectSkillConfigPath, "--output", join(temp, "object-skill"), "--strict"]), "skillPurpose must be a string or an array of strings");
   const yamlSkillConfigPath = join(temp, "yaml-skill-config.json");
   const yamlSkillConfig = JSON.parse(readFileSync(functionalConfigPath, "utf8"));
-  yamlSkillConfig.skillDescription = "Create: reports for users";
+  yamlSkillConfig.skillDescription = "Create: reports for users. Use when users need generated reports.";
   yamlSkillConfig.shortDescription = 'Create "quoted" reports';
   yamlSkillConfig.defaultTask = 'create "quoted" reports';
   writeFileSync(yamlSkillConfigPath, JSON.stringify(yamlSkillConfig, null, 2));
   const yamlSkillOutDir = join(temp, "yaml-skill");
   assertOk("render yaml-safe skill description", run(["scripts/render-skill.mjs", "--input", yamlSkillConfigPath, "--output", yamlSkillOutDir, "--strict"]));
-  assertFileIncludes("yaml-safe skill description quoted", join(yamlSkillOutDir, "SKILL.md"), 'description: "Create: reports for users"');
+  assertFileIncludes("yaml-safe skill description quoted", join(yamlSkillOutDir, "SKILL.md"), 'description: "Create: reports for users. Use when users need generated reports."');
   assertFileIncludes("yaml-safe skill metadata quoted", join(yamlSkillOutDir, "agents", "openai.yaml"), 'short_description: "Create \\"quoted\\" reports"');
   assertOk("validate yaml-safe skill", run(["scripts/validate-skill-output.mjs", yamlSkillOutDir]));
   mkdirSync(join(yamlSkillOutDir, "assets"), { recursive: true });

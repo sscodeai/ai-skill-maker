@@ -8,7 +8,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const skillRoot = dirname(here);
 const defaultTemplate = join(skillRoot, "assets", "templates", "project-skill");
 const examplesDir = join(skillRoot, "assets", "examples");
-const configSchemaPath = join(skillRoot, "references", "config-schema.md");
+const configSchemaPath = join(skillRoot, "references", "project-config-schema.md");
 
 function parseArgs(argv) {
   const args = {};

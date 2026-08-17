@@ -8,6 +8,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const skillRoot = dirname(here);
 const defaultTemplate = join(skillRoot, "assets", "templates", "skill");
 const examplesDir = join(skillRoot, "assets", "examples");
+const configSchemaPath = join(skillRoot, "references", "skill-config-schema.md");
 const initConfigs = new Map([
   ["functional", "functional-skill-config.json"],
   ["presentation", "functional-skill-config.json"],
@@ -24,7 +25,9 @@ function parseArgs(argv) {
     if (arg === "--input") args.input = argv[++i];
     else if (arg === "--output") args.output = argv[++i];
     else if (arg === "--template") args.template = argv[++i];
+    else if (arg === "--mode") args.mode = argv[++i];
     else if (arg === "--init-config") args.initConfig = argv[++i];
+    else if (arg === "--print-schema") args.printSchema = true;
     else if (arg === "--strict") args.strict = true;
     else if (arg === "--help") args.help = true;
     else throw new Error(`Unknown argument: ${arg}`);
@@ -34,8 +37,9 @@ function parseArgs(argv) {
 
 function usage() {
   console.log(`Usage:
-  node scripts/render-skill.mjs --input config.json --output <skill-dir> [--template <dir>] [--strict]
-  node scripts/render-skill.mjs --init-config functional|document|workflow|refresh`);
+  node scripts/render-skill.mjs --input config.json --output <skill-dir> [--template <dir>] [--mode functional|document|workflow|refresh] [--strict]
+  node scripts/render-skill.mjs --init-config functional|document|workflow|refresh
+  node scripts/render-skill.mjs --print-schema`);
 }
 
 function slugify(value) {
@@ -114,6 +118,11 @@ function preserveManualBlock(next, previous) {
 }
 
 const args = parseArgs(process.argv);
+if (args.printSchema) {
+  console.log(readFileSync(configSchemaPath, "utf8"));
+  process.exit(0);
+}
+
 if (args.initConfig) {
   const mode = String(args.initConfig).toLowerCase();
   if (!initConfigs.has(mode)) {
@@ -130,7 +139,7 @@ if (args.help || !args.input || !args.output) {
 }
 
 const config = JSON.parse(readFileSync(args.input, "utf8"));
-const validation = validateSkillConfig(config, { strict: args.strict });
+const validation = validateSkillConfig(config, { mode: args.mode || config.mode, strict: args.strict });
 if (!validation.ok) {
   console.error(formatSkillConfigValidation(validation, args.input));
   process.exit(1);

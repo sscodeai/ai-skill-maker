@@ -31,7 +31,7 @@ If the mode is ambiguous, infer it from available artifacts. Ask only when the c
 3. Separate every claim into one of: observed facts, declared user intent, recommended standards, inferred assumptions. Read `references/rules/evidence-vs-recommendation.md`.
 4. Choose applicable standards for the selected skill type, artifact type, workflow, assistant platform, and verification needs.
 5. Choose output adapters. Default to a Codex-compatible skill folder or platform-neutral instruction bundle; read adapter references only when requested.
-6. Validate finished configs with `scripts/validate-config.mjs --strict` when the output is meant to be durable rather than a rough draft.
+6. Validate durable configs before rendering: use `scripts/validate-skill-config.mjs --strict` for general skills and `scripts/validate-config.mjs --strict` for project maintainer compatibility outputs.
 7. Render general skills with `scripts/render-skill.mjs`; use `scripts/render-project-skill.mjs` only for project maintainer compatibility outputs.
 8. Validate general skill outputs with `scripts/validate-skill-output.mjs`; validate project maintainer compatibility outputs with `scripts/validate-project-skill.mjs`. Run platform-specific compatibility checks when relevant.
 9. Report the final path, generated files, preserved user areas, validation result, and suggested invocation prompt.
@@ -73,10 +73,10 @@ Use the shared output contract before emitting adapter-specific files.
 - `scripts/draft-project-config.mjs --repo <repo>`: draft a repo-mode render config from collected repository signals.
 - `scripts/render-adapter.mjs --input config.json --adapter agents|claude|cursor|copilot --output <repo-root-or-file> [--force]`: render platform-specific instruction files while preserving marked generated blocks.
 - `scripts/validate-config.mjs --input config.json [--mode genesis|repo] [--strict]`: check config shape, evidence labels, strict-mode coverage, and repo-mode observed fact citations.
-- `scripts/validate-skill-config.mjs --input config.json [--strict]`: check general skill config shape, required strict fields, and evidence labels.
-- `scripts/render-skill.mjs --input config.json --output <skill-dir> [--template <dir>] [--strict]`: render or refresh a general generated skill while preserving manual blocks.
+- `scripts/validate-skill-config.mjs --input config.json [--mode functional|document|workflow|refresh] [--strict]`: check general skill config shape, required strict fields, trigger metadata, and evidence labels.
+- `scripts/render-skill.mjs --input config.json --output <skill-dir> [--template <dir>] [--mode functional|document|workflow|refresh] [--strict]`: render or refresh a general generated skill while preserving manual blocks. Use `--print-schema` to show the general skill config schema.
 - `scripts/validate-skill-output.mjs <skill-dir>`: verify required generated skill files, metadata, evidence ledgers, and manual preservation markers.
-- `scripts/render-project-skill.mjs --input config.json --output <skill-dir> [--template <dir>] [--strict]`: current compatibility renderer for project maintainer skills while general skill rendering is added.
+- `scripts/render-project-skill.mjs --input config.json --output <skill-dir> [--template <dir>] [--mode genesis|repo] [--strict]`: current compatibility renderer for project maintainer skills while general skill rendering is added. Use `--print-schema` to show the project maintainer config schema.
 - `scripts/validate-project-skill.mjs <skill-dir>`: current compatibility validator for generated project maintainer skill folders.
 - `scripts/self-check.mjs [--check-installed]`: run repository health checks for render, validation, template failure behavior, and optional installed skill sync.
 - `scripts/install-local-skill.mjs [--skills-dir <dir>]`: sync this repository to the local Codex personal skills directory.

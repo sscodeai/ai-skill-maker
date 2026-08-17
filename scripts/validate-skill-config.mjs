@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 const evidenceLabels = ["observed_fact", "declared_intent", "recommended_standard", "inferred_assumption"];
 
 const knownFields = new Set([
+  "mode",
   "skillName",
   "displayName",
   "skillDescription",
@@ -63,6 +64,7 @@ function parseArgs(argv) {
   for (let i = 2; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === "--input") args.input = argv[++i];
+    else if (arg === "--mode") args.mode = argv[++i];
     else if (arg === "--strict") args.strict = true;
     else if (arg === "--help") args.help = true;
     else throw new Error(`Unknown argument: ${arg}`);
@@ -72,7 +74,7 @@ function parseArgs(argv) {
 
 function usage() {
   console.log(`Usage:
-  node scripts/validate-skill-config.mjs --input config.json [--strict]`);
+  node scripts/validate-skill-config.mjs --input config.json [--mode functional|document|workflow|refresh] [--strict]`);
 }
 
 function isNonEmptyString(value) {
@@ -98,6 +100,10 @@ function evidenceCounts(text) {
   return Object.fromEntries(evidenceLabels.map((label) => [label, (text.match(new RegExp(`${label}:`, "g")) || []).length]));
 }
 
+function inferMode(config, explicitMode) {
+  return explicitMode || config.mode || null;
+}
+
 export function validateSkillConfig(config, options = {}) {
   const errors = [];
   const warnings = [];
@@ -106,8 +112,14 @@ export function validateSkillConfig(config, options = {}) {
     return { ok: false, errors: ["Config must be a JSON object."], warnings, counts: {} };
   }
 
+  const mode = inferMode(config, options.mode);
+
   if (config.skillName !== undefined && !/^[a-z0-9][a-z0-9-]{0,62}$/.test(String(config.skillName))) {
     errors.push("skillName must use lowercase letters, digits, and hyphens, starting with a letter or digit, up to 63 characters.");
+  }
+
+  if (mode && !["functional", "document", "workflow", "refresh"].includes(mode)) {
+    errors.push("mode must be one of: functional, document, workflow, refresh.");
   }
 
   for (const field of Object.keys(config)) {
@@ -133,8 +145,8 @@ export function validateSkillConfig(config, options = {}) {
       if (!isNonEmptyString(fieldText(config[field]))) errors.push(`${field} is required in strict mode.`);
     }
 
-    if (!isNonEmptyString(config.skillName) && !isNonEmptyString(config.displayName)) {
-      errors.push("Strict mode requires skillName or displayName.");
+    if (isNonEmptyString(config.skillDescription) && !/\buse when\b/i.test(config.skillDescription)) {
+      errors.push('skillDescription must include trigger guidance such as "Use when" in strict mode.');
     }
 
     const usedCategories = evidenceLabels.filter((label) => counts[label] > 0);
@@ -147,7 +159,7 @@ export function validateSkillConfig(config, options = {}) {
     warnings.push("Config contains more inferred_assumption entries than grounded facts, declared intent, and standards combined.");
   }
 
-  return { ok: errors.length === 0, errors, warnings, counts };
+  return { ok: errors.length === 0, errors, warnings, mode, counts };
 }
 
 export function formatSkillConfigValidation(result, label = "config") {
@@ -156,6 +168,7 @@ export function formatSkillConfigValidation(result, label = "config") {
   else lines.push(`Skill config validation failed: ${label}`);
   for (const error of result.errors) lines.push(`ERROR: ${error}`);
   for (const warning of result.warnings) lines.push(`WARN: ${warning}`);
+  if (result.mode) lines.push(`Mode: ${result.mode}`);
   if (result.counts) {
     const summary = evidenceLabels.map((label) => `${label}=${result.counts[label] || 0}`).join(", ");
     lines.push(`Evidence: ${summary}`);
@@ -187,7 +200,7 @@ function main() {
     process.exit(1);
   }
 
-  const result = validateSkillConfig(config, { strict: args.strict });
+  const result = validateSkillConfig(config, { mode: args.mode, strict: args.strict });
   console.log(formatSkillConfigValidation(result, basename(args.input)));
   process.exit(result.ok ? 0 : 1);
 }
