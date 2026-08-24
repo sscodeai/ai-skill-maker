@@ -386,6 +386,10 @@ try {
     process.exit(1);
   }
   console.log("OK SKILL.md workflow sections");
+  assertOk("core principles fingerprint check", run(["scripts/check-core-principles.mjs"]));
+  assertOk("file budget guardrail", run(["scripts/file-budget.mjs"]));
+  assertFileIncludes("SKILL.md routes protected core", join(repoRoot, "SKILL.md"), "references/rules/protected-core-principles.md");
+  assertFileIncludes("SKILL.md routes file budget", join(repoRoot, "SKILL.md"), "scripts/file-budget.mjs");
   assertFileIncludes("SKILL.md routes general validator", join(repoRoot, "SKILL.md"), "Validate general skill outputs with `scripts/validate-skill-output.mjs`");
   assertFileIncludes("SKILL.md routes project validator", join(repoRoot, "SKILL.md"), "validate project maintainer compatibility outputs with `scripts/validate-project-skill.mjs`");
   assertFileIncludes("SKILL.md has ai-skill-maker name", join(repoRoot, "SKILL.md"), "name: ai-skill-maker");

@@ -11,6 +11,30 @@ Create reusable AI skills and instruction bundles that future coding agents can 
 
 Keep this `SKILL.md` small. Load only the references needed for the requested mode, standards, and output adapters.
 
+## Protected Core (Constitution)
+
+Read `references/rules/protected-core-principles.md` before creating, refreshing, or
+auditing any skill. The section between `<!-- PROTECTED_CORE_START -->` and
+`<!-- PROTECTED_CORE_END -->` there is the behavior constitution: ordinary
+optimization, simplification, refactoring, migration, or wording changes do NOT
+authorize deleting, downgrading, moving, merging, renaming, or reordering those
+principles. Only when the user explicitly names a core principle in the current
+request may it change, and then `scripts/check-core-principles.mjs --fix` must
+regenerate `references/rules/core-principles.lock.json`.
+
+Before committing anything that touches `SKILL.md`, this file, or maker
+references, run `scripts/check-core-principles.mjs`. It fails loudly when the
+protected section drifted from the lock.
+
+## File Budget Guardrail
+
+Active Markdown instruction files (SKILL.md and `references/**`, excluding
+README/LICENSE) are subject to a hard ceiling of 9,000 tokens per file,
+estimated as UTF-8 bytes / 4. Run `scripts/file-budget.mjs` before committing
+maker changes, and run it on generated skills when the output includes many
+references. If a generated reference would exceed the ceiling, split it or move
+detail into non-Markdown assets; never delete user capabilities to fit.
+
 ## Mode Selection
 
 - Use **functional skill mode** when the output skill should perform a reusable capability such as creating presentations, Markdown reports, PDFs, spreadsheets, images, data workflows, or API tasks. Read `references/modes/functional-skill.md` and `references/checklists/functional-skill-intake.md`.

@@ -108,12 +108,26 @@ function manualBlock(text) {
   return match ? match[1] : null;
 }
 
+function protectedCoreBlock(text) {
+  const match = text.match(/<!-- PROTECTED_CORE_START -->([\s\S]*?)<!-- PROTECTED_CORE_END -->/);
+  return match ? match[1] : null;
+}
+
 function preserveManualBlock(next, previous) {
   const block = manualBlock(previous);
   if (block === null) return next;
   return next.replace(
     /<!-- BEGIN USER RULES -->[\s\S]*?<!-- END USER RULES -->/,
     () => `<!-- BEGIN USER RULES -->${block}<!-- END USER RULES -->`
+  );
+}
+
+function preserveProtectedCore(next, previous) {
+  const block = protectedCoreBlock(previous);
+  if (block === null) return next;
+  return next.replace(
+    /<!-- PROTECTED_CORE_START -->[\s\S]*?<!-- PROTECTED_CORE_END -->/,
+    () => `<!-- PROTECTED_CORE_START -->${block}<!-- PROTECTED_CORE_END -->`
   );
 }
 
@@ -160,6 +174,9 @@ for (const source of listFiles(template)) {
     let text = render(raw.toString("utf8"), config);
     if (existsSync(dest) && text.includes("BEGIN USER RULES")) {
       text = preserveManualBlock(text, readFileSync(dest, "utf8"));
+    }
+    if (existsSync(dest) && text.includes("PROTECTED_CORE_START")) {
+      text = preserveProtectedCore(text, readFileSync(dest, "utf8"));
     }
     writeFileSync(dest, text);
   } else {
