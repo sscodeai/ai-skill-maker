@@ -125,6 +125,11 @@ function preserveManualBlock(next, previous) {
 function preserveProtectedCore(next, previous) {
   const block = protectedCoreBlock(previous);
   if (block === null) return next;
+  if (!next.includes("<!-- PROTECTED_CORE_START -->")) {
+    // Fresh template has no protected block; append the target's block so it
+    // survives the refresh instead of being silently dropped.
+    return `${next}\n\n<!-- PROTECTED_CORE_START -->${block}<!-- PROTECTED_CORE_END -->\n`;
+  }
   return next.replace(
     /<!-- PROTECTED_CORE_START -->[\s\S]*?<!-- PROTECTED_CORE_END -->/,
     () => `<!-- PROTECTED_CORE_START -->${block}<!-- PROTECTED_CORE_END -->`
@@ -175,7 +180,10 @@ for (const source of listFiles(template)) {
     if (existsSync(dest) && text.includes("BEGIN USER RULES")) {
       text = preserveManualBlock(text, readFileSync(dest, "utf8"));
     }
-    if (existsSync(dest) && text.includes("PROTECTED_CORE_START")) {
+    // Preserve any PROTECTED_CORE block the target skill already carries,
+    // even when the fresh template does not include one. The maker must
+    // never strip a target skill's protected constitution on refresh.
+    if (existsSync(dest) && readFileSync(dest, "utf8").includes("PROTECTED_CORE_START")) {
       text = preserveProtectedCore(text, readFileSync(dest, "utf8"));
     }
     writeFileSync(dest, text);
