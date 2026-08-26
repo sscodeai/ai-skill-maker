@@ -379,6 +379,10 @@ try {
   assertOk("render refresh output second pass", run(["scripts/render-project-skill.mjs", "--input", refreshConfigPath, "--output", refreshOutDir]));
   assertFileIncludes("refresh preserves user rules", intentPath, preservedRule);
   assertOk("validate refresh output", run(["scripts/validate-project-skill.mjs", refreshOutDir]));
+  assertFileIncludes("project skill includes evaluation section", join(refreshOutDir, "SKILL.md"), "## Evaluation");
+  assertFileIncludes("project trigger eval rendered", join(refreshOutDir, "references", "evals", "trigger-tests.md"), "Trigger Tests");
+  assertFileIncludes("project output eval rendered", join(refreshOutDir, "references", "evals", "output-assertions.md"), "Output Assertions");
+  assertFileIncludes("project release eval rendered", join(refreshOutDir, "references", "evals", "release-gate.md"), "Release Gate");
 
   const budgetTarget = join(temp, "budget-target");
   mkdirSync(join(budgetTarget, "references"), { recursive: true });
