@@ -5,12 +5,12 @@
 //   With a folder: check a generated/installed skill payload.
 // Exit 0 when every active Markdown instruction file is within budget; exit 1 otherwise.
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
-import { dirname, join, relative } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = dirname(here);
-const target = process.argv[2] || repoRoot;
+const target = resolve(process.argv[2] || repoRoot);
 const HARD_CEILING_TOKENS = 9000;
 const budgetDirs = ["references", "assets", "templates"];
 const skipDirs = new Set([".git", "node_modules"]);
@@ -38,8 +38,7 @@ for (const dir of budgetDirs) {
   const full = join(target, dir);
   if (existsSync(full) && statSync(full).isDirectory()) walk(full, target, files);
 }
-// Include SKILL.md itself when checking the maker repo.
-if (target === repoRoot && existsSync(join(target, "SKILL.md"))) files.push("SKILL.md");
+if (existsSync(join(target, "SKILL.md"))) files.push("SKILL.md");
 
 let failed = false;
 for (const file of files.sort()) {

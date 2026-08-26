@@ -380,6 +380,12 @@ try {
   assertFileIncludes("refresh preserves user rules", intentPath, preservedRule);
   assertOk("validate refresh output", run(["scripts/validate-project-skill.mjs", refreshOutDir]));
 
+  const budgetTarget = join(temp, "budget-target");
+  mkdirSync(join(budgetTarget, "references"), { recursive: true });
+  writeFileSync(join(budgetTarget, "SKILL.md"), "A".repeat(40000));
+  writeFileSync(join(budgetTarget, "references", "small.md"), "ok\n");
+  assertFailIncludes("file budget checks target SKILL.md", run(["scripts/file-budget.mjs", budgetTarget]), "SKILL.md");
+
   const skill = readFileSync(join(repoRoot, "SKILL.md"), "utf8");
   if (!skill.includes("## Mode Selection") || !skill.includes("## Core Workflow")) {
     console.error("FAIL SKILL.md workflow sections");
