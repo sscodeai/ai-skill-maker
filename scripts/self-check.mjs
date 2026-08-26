@@ -379,6 +379,16 @@ try {
   assertOk("render refresh output second pass", run(["scripts/render-project-skill.mjs", "--input", refreshConfigPath, "--output", refreshOutDir]));
   assertFileIncludes("refresh preserves user rules", intentPath, preservedRule);
   assertOk("validate refresh output", run(["scripts/validate-project-skill.mjs", refreshOutDir]));
+  assertFileIncludes("project skill includes evaluation section", join(refreshOutDir, "SKILL.md"), "## Evaluation");
+  assertFileIncludes("project trigger eval rendered", join(refreshOutDir, "references", "evals", "trigger-tests.md"), "Trigger Tests");
+  assertFileIncludes("project output eval rendered", join(refreshOutDir, "references", "evals", "output-assertions.md"), "Output Assertions");
+  assertFileIncludes("project release eval rendered", join(refreshOutDir, "references", "evals", "release-gate.md"), "Release Gate");
+
+  const budgetTarget = join(temp, "budget-target");
+  mkdirSync(join(budgetTarget, "references"), { recursive: true });
+  writeFileSync(join(budgetTarget, "SKILL.md"), "A".repeat(40000));
+  writeFileSync(join(budgetTarget, "references", "small.md"), "ok\n");
+  assertFailIncludes("file budget checks target SKILL.md", run(["scripts/file-budget.mjs", budgetTarget]), "SKILL.md");
 
   const skill = readFileSync(join(repoRoot, "SKILL.md"), "utf8");
   if (!skill.includes("## Mode Selection") || !skill.includes("## Core Workflow")) {
@@ -386,6 +396,15 @@ try {
     process.exit(1);
   }
   console.log("OK SKILL.md workflow sections");
+  assertOk("core principles fingerprint check", run(["scripts/check-core-principles.mjs"]));
+  assertOk("file budget guardrail", run(["scripts/file-budget.mjs"]));
+  assertFileIncludes("SKILL.md routes protected core", join(repoRoot, "SKILL.md"), "references/rules/protected-core-principles.md");
+  assertFileIncludes("SKILL.md routes file budget", join(repoRoot, "SKILL.md"), "scripts/file-budget.mjs");
+  assertFileIncludes("SKILL.md routes trust gate", join(repoRoot, "SKILL.md"), "references/checklists/trust-gate.md");
+  assertFileIncludes("SKILL.md routes root problem", join(repoRoot, "SKILL.md"), "Settle the root problem first");
+  assertFileIncludes("trust gate has ledger", join(repoRoot, "references", "checklists", "trust-gate.md"), "Evidence Ledger");
+  assertFileIncludes("trust gate has labels", join(repoRoot, "references", "checklists", "trust-gate.md"), "recommended_standard:");
+  assertFileIncludes("intake has root problem", join(repoRoot, "references", "checklists", "functional-skill-intake.md"), "Root Problem");
   assertFileIncludes("SKILL.md routes general validator", join(repoRoot, "SKILL.md"), "Validate general skill outputs with `scripts/validate-skill-output.mjs`");
   assertFileIncludes("SKILL.md routes project validator", join(repoRoot, "SKILL.md"), "validate project maintainer compatibility outputs with `scripts/validate-project-skill.mjs`");
   assertFileIncludes("SKILL.md has ai-skill-maker name", join(repoRoot, "SKILL.md"), "name: ai-skill-maker");

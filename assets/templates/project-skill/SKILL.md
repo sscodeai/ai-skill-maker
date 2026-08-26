@@ -20,6 +20,18 @@ description: {{yaml:projectSkillDescription}}
 5. Make changes in the repo's existing style.
 6. Run the verification commands appropriate to the change and report any commands that could not be run.
 
+## Evaluation
+
+The skill ships with an evaluation skeleton under `references/evals/`:
+
+- `trigger-tests.md` - requests that should and should not activate this skill
+- `output-assertions.md` - objective assertions about the final output
+- `release-gate.md` - release checklist (BLOCK/ALLOW) before sharing or publishing
+
+Fill the tables with real project examples before relying on this skill in
+production, and record pass/fail evidence after each run. Do not claim the skill
+is release-ready until the release gate is all ALLOW with recorded evidence.
+
 ## Evidence Discipline
 
 Treat reference claims according to their labels:

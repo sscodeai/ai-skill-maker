@@ -11,6 +11,30 @@ Create reusable AI skills and instruction bundles that future coding agents can 
 
 Keep this `SKILL.md` small. Load only the references needed for the requested mode, standards, and output adapters.
 
+## Protected Core (Constitution)
+
+Read `references/rules/protected-core-principles.md` before creating, refreshing, or
+auditing any skill. The section between `<!-- PROTECTED_CORE_START -->` and
+`<!-- PROTECTED_CORE_END -->` there is the behavior constitution: ordinary
+optimization, simplification, refactoring, migration, or wording changes do NOT
+authorize deleting, downgrading, moving, merging, renaming, or reordering those
+principles. Only when the user explicitly names a core principle in the current
+request may it change, and then `scripts/check-core-principles.mjs --fix` must
+regenerate `references/rules/core-principles.lock.json`.
+
+Before committing anything that touches `SKILL.md`, this file, or maker
+references, run `scripts/check-core-principles.mjs`. It fails loudly when the
+protected section drifted from the lock.
+
+## File Budget Guardrail
+
+Active Markdown instruction files (SKILL.md and `references/**`, excluding
+README/LICENSE) are subject to a hard ceiling of 9,000 tokens per file,
+estimated as UTF-8 bytes / 4. Run `scripts/file-budget.mjs` before committing
+maker changes, and run it on generated skills when the output includes many
+references. If a generated reference would exceed the ceiling, split it or move
+detail into non-Markdown assets; never delete user capabilities to fit.
+
 ## Mode Selection
 
 - Use **functional skill mode** when the output skill should perform a reusable capability such as creating presentations, Markdown reports, PDFs, spreadsheets, images, data workflows, or API tasks. Read `references/modes/functional-skill.md` and `references/checklists/functional-skill-intake.md`.
@@ -25,16 +49,18 @@ If the mode is ambiguous, infer it from available artifacts. Ask only when the c
 ## Core Workflow
 
 1. Establish the language and locale profile for the author, project references, and public expression. Keep core reusable agent instructions in English. Read `references/rules/language-policy.md`.
-2. Gather evidence and intent.
+2. **Settle the root problem first.** Read `references/checklists/functional-skill-intake.md` (Root Problem section) before gathering capability details. State the root problem in one sentence; ask one clarifying question if you cannot. Do not design around the user's first phrasing when it is a symptom.
+3. **Run the Trust Gate before generating.** Read `references/checklists/trust-gate.md` and record PASS/BLOCK for permissions, sensitive data, dependencies, environment, external actions, and rollback. One BLOCK stops generation until the root cause is fixed. Do not let prose or a high score compensate for an unsafe permission, leakage, opaque dependency, or unfit environment.
+4. Gather evidence and intent.
    - For new functional skills, interview for examples, triggering language, artifacts, reusable resources, validation, and platform targets.
    - For project maintainer outputs, interview or scan the repo according to genesis/repo mode.
-3. Separate every claim into one of: observed facts, declared user intent, recommended standards, inferred assumptions. Read `references/rules/evidence-vs-recommendation.md`.
-4. Choose applicable standards for the selected skill type, artifact type, workflow, assistant platform, and verification needs.
-5. Choose output adapters. Default to a Codex-compatible skill folder or platform-neutral instruction bundle; read adapter references only when requested.
-6. Validate durable configs before rendering: use `scripts/validate-skill-config.mjs --strict` for general skills and `scripts/validate-config.mjs --strict` for project maintainer compatibility outputs.
-7. Render general skills with `scripts/render-skill.mjs`; use `scripts/render-project-skill.mjs` only for project maintainer compatibility outputs.
-8. Validate general skill outputs with `scripts/validate-skill-output.mjs`; validate project maintainer compatibility outputs with `scripts/validate-project-skill.mjs`. Run platform-specific compatibility checks when relevant.
-9. Report the final path, generated files, preserved user areas, validation result, and suggested invocation prompt.
+5. Separate every claim into one of: observed facts, declared user intent, recommended standards, inferred assumptions. Read `references/rules/evidence-vs-recommendation.md`.
+6. Choose applicable standards for the selected skill type, artifact type, workflow, assistant platform, and verification needs.
+7. Choose output adapters. Default to a Codex-compatible skill folder or platform-neutral instruction bundle; read adapter references only when requested.
+8. Validate durable configs before rendering: use `scripts/validate-skill-config.mjs --strict` for general skills and `scripts/validate-config.mjs --strict` for project maintainer compatibility outputs.
+9. Render general skills with `scripts/render-skill.mjs`; use `scripts/render-project-skill.mjs` only for project maintainer compatibility outputs.
+10. Validate general skill outputs with `scripts/validate-skill-output.mjs`; validate project maintainer compatibility outputs with `scripts/validate-project-skill.mjs`. Run platform-specific compatibility checks when relevant. If the generated skill includes `references/evals/`, run the release gate (BLOCK/ALLOW) before declaring it ready.
+11. Report the final path, generated files, preserved user areas, validation result, trust gate result, and suggested invocation prompt.
 
 For forward-testing this maker itself in a fresh session, read `references/evals/forward-tests.md`.
 

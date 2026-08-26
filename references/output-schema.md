@@ -97,6 +97,33 @@ Generated Markdown files should contain one editable user block when the file is
 
 Refresh workflow must preserve the content between markers. Generated content outside the block may be replaced.
 
+Protected core blocks (`<!-- PROTECTED_CORE_START -->` ... `<!-- PROTECTED_CORE_END -->`) are also preserved on refresh and must never be rewritten or stripped unless the user explicitly asks.
+
+## Evaluation Skeleton
+
+Generated functional, document, workflow, and project-maintainer skills should ship an evaluation skeleton under `references/evals/`:
+
+- `trigger-tests.md` — a table of requests that should and should not activate the skill
+- `output-assertions.md` — objective assertions about the final output, each with a verification method
+- `release-gate.md` — a BLOCK/ALLOW checklist (trigger, output, structure, budget, trust, license)
+
+The tables start with placeholder rows; the user fills them with real examples. The generated `SKILL.md` references the skeleton so a future session knows how to verify the skill before relying on it.
+
+Evidence rule: structure existing, fields complete, or scripts passing prove only that structure. Record the actual artifact produced, not internal steps. Missing evidence is a BLOCK, never an ALLOW.
+
+## Release Gate
+
+Before sharing or publishing a generated skill, the release gate must be all ALLOW with recorded evidence:
+
+- Trigger: every trigger-test row passes in a fresh session
+- Output: every output-assertion passes on the most recent run
+- Structure: the matching validator passes
+- Budget: active Markdown instruction files stay within the file budget
+- Trust: no unsafe permissions, sensitive-data leakage, opaque dependencies, or unfit environment
+- License: third-party material retains its licenses and attribution
+
+High-risk actions (creating a remote repository, changing visibility, force-pushing, deleting files) require separate user permission.
+
 ## SKILL.md Requirements
 
 The generated `SKILL.md` should:

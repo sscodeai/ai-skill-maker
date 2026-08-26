@@ -20,6 +20,9 @@ const required = [
   "references/verification.md",
   "references/release.md",
   "references/generated-files.md",
+  "references/evals/trigger-tests.md",
+  "references/evals/output-assertions.md",
+  "references/evals/release-gate.md",
 ];
 
 function walk(path, out = []) {

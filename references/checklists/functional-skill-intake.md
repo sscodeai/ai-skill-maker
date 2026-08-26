@@ -2,6 +2,21 @@
 
 Use this checklist before rendering a new functional skill.
 
+## Root Problem (归根)
+
+Before any capability details, settle the root problem. The user's first
+phrasing is a symptom, not the problem.
+
+- What is the user REALLY trying to accomplish, stripped of the example they gave?
+- What recurring pain makes this worth a Skill instead of a one-off result?
+- What would "done" look like to the user, and how would they verify it?
+- What is the SMALLEST useful capability that solves the root problem? (Not the longest prompt, highest self-score, or largest feature set.)
+- If the user's request is feature-driven ("add X"), ask what X enables before designing around X.
+- If the skill would replace a manual workflow, what does the manual workflow's critical step look like?
+
+Record the root problem in one sentence before continuing. If you cannot state
+it, ask one clarifying question — not a multi-round interview.
+
 ## First Questions
 
 - What capability should the skill provide?
