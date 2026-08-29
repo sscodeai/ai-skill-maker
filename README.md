@@ -24,6 +24,7 @@ and refresh-safe user rule blocks.
 
 ```bash
 node scripts/self-check.mjs
+node scripts/install-local-skill.mjs --dry-run
 ```
 
 ---
@@ -75,10 +76,10 @@ strict config, and verify the result before it is treated as ready.
 | --- | --- |
 | 🎯 Root problem first | Design around the recurring need, not the user's first phrasing |
 | 🧾 Evidence discipline | Label claims as `observed_fact`, `declared_intent`, `recommended_standard`, or `inferred_assumption` |
-| 🛡️ Trust Gate | Block unsafe permissions, sensitive-data leakage, opaque dependencies, and unfit environments |
-| 🧪 Evaluation skeleton | Ship trigger tests, output assertions, and BLOCK/ALLOW release gates |
+| 🛡️ Trust Gate | Require explicit PASS/BLOCK review for permissions, sensitive data, dependencies, environment, external actions, and rollback |
+| 🧪 Evaluation skeleton | Ship trigger tests, output assertions, and BLOCK/ALLOW release gates that must be filled with real evidence |
 | 🔒 Refresh safety | Preserve user-authored rule blocks and protected core blocks |
-| 📏 File budget | Keep active Markdown instruction files below the 9,000-token ceiling |
+| 📏 File budget | Automatically check active Markdown instruction files against the 9,000-token ceiling |
 
 ---
 
@@ -112,6 +113,19 @@ node scripts/validate-project-skill.mjs ./project-maintainer
 ```
 
 ### 🧠 Install As A Codex Skill
+
+By default, installation syncs the runtime payload into the local
+`ai-skill-maker` personal skill directory. If that directory already exists and
+is not this source checkout, it is replaced with the current payload:
+`SKILL.md`, `agents/`, `references/`, `assets/`, and `scripts/`.
+
+Preview the target and replacement behavior without writing files:
+
+```bash
+node scripts/install-local-skill.mjs --dry-run
+```
+
+Install or sync the local skill:
 
 ```bash
 node scripts/install-local-skill.mjs
@@ -149,8 +163,8 @@ flowchart LR
 | 4 | Select mode and adapter | Renderer choice |
 | 5 | Validate before rendering | Strict config check |
 | 6 | Render or refresh | Skill folder or instruction bundle |
-| 7 | Validate output | Structure, metadata, ledgers, user blocks, file budget |
-| 8 | Release only with evidence | Trigger tests, output assertions, release gate |
+| 7 | Validate output | Structure, metadata, evidence labels, ledgers, user-rule markers, file budget |
+| 8 | Release only with recorded evidence | Trigger tests, output assertions, structure validation, file budget, trust, license attribution |
 
 ---
 
@@ -233,8 +247,9 @@ scripts/                         # renderers, validators, repo scanners, guardra
 | `node scripts/render-adapter.mjs --input config.json --adapter agents\|claude\|cursor\|copilot --output <path>` | Render assistant instruction files while preserving generated blocks |
 | `node scripts/check-core-principles.mjs` | Verify the protected core principle fingerprint |
 | `node scripts/file-budget.mjs [skill-dir]` | Enforce the 9,000-token ceiling for active Markdown instruction files |
+| `node scripts/check-release-gate.mjs <skill-dir>` | Check whether release-gate evidence has been recorded for required gates |
 | `node scripts/self-check.mjs` | Run the full repository health check |
-| `node scripts/install-local-skill.mjs` | Install this maker into the local Codex personal skills directory |
+| `node scripts/install-local-skill.mjs [--dry-run]` | Preview or sync this maker into the local Codex personal skills directory |
 
 ---
 
@@ -261,6 +276,13 @@ BLOCK/ALLOW only: trigger tests, output assertions, structure validation, file
 budget, trust, and license attribution must all have recorded evidence before a
 skill is described as release-ready.
 
+The validators and guardrail scripts are intentionally scoped. They can check
+required files, YAML metadata, evidence labels, release-gate evidence cells,
+file budget, and user-rule preservation markers. They do not prove that a skill
+is absolutely safe, complete, or ready to publish; that still requires real
+trigger-test results, output assertions, Trust Gate review, and license evidence
+recorded in the release gate.
+
 ---
 
 ## 🛡️ Safety Model
@@ -281,6 +303,7 @@ user explicitly approves changing a protected core principle.
 | Instruction file budget | `scripts/file-budget.mjs` |
 | Config shape and evidence labels | `validate-skill-config.mjs`, `validate-config.mjs` |
 | Rendered output structure | `validate-skill-output.mjs`, `validate-project-skill.mjs` |
+| Recorded release-gate evidence | `scripts/check-release-gate.mjs` |
 | End-to-end repository health | `scripts/self-check.mjs` |
 
 ---

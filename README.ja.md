@@ -24,6 +24,7 @@ labels、validation scripts、release gates、refresh-safe な user rule blocks
 
 ```bash
 node scripts/self-check.mjs
+node scripts/install-local-skill.mjs --dry-run
 ```
 
 ---
@@ -75,10 +76,10 @@ render し、ready と言う前に結果を verify できるようにします�
 | --- | --- |
 | 🎯 Root problem first | ユーザーの最初の言い方ではなく、繰り返し発生する本当の問題から設計する |
 | 🧾 Evidence discipline | 主張を `observed_fact`、`declared_intent`、`recommended_standard`、`inferred_assumption` に分ける |
-| 🛡️ Trust Gate | 危険な permissions、sensitive-data leakage、不透明な dependencies、不適切な environments を block する |
-| 🧪 Evaluation skeleton | trigger tests、output assertions、BLOCK/ALLOW release gates を同梱する |
+| 🛡️ Trust Gate | permissions、sensitive data、dependencies、environment、external actions、rollback を明示的に PASS/BLOCK review する |
+| 🧪 Evaluation skeleton | real evidence を記録するための trigger tests、output assertions、BLOCK/ALLOW release gates を同梱する |
 | 🔒 Refresh safety | user-authored rule blocks と protected core blocks を保持する |
-| 📏 File budget | active Markdown instruction files を 9,000-token ceiling 未満に保つ |
+| 📏 File budget | active Markdown instruction files を 9,000-token ceiling に対して自動チェックする |
 
 ---
 
@@ -112,6 +113,19 @@ node scripts/validate-project-skill.mjs ./project-maintainer
 ```
 
 ### 🧠 Codex Skill としてインストール
+
+Default install は runtime payload を local `ai-skill-maker` personal skill
+directory に sync します。その directory がすでに存在し、この source checkout
+自身ではない場合、現在の payload で置き換えます。対象は `SKILL.md`、
+`agents/`、`references/`、`assets/`、`scripts/` です。
+
+書き込みなしで target と replacement behavior を確認する場合:
+
+```bash
+node scripts/install-local-skill.mjs --dry-run
+```
+
+Local skill を install または sync する場合:
 
 ```bash
 node scripts/install-local-skill.mjs
@@ -149,8 +163,8 @@ flowchart LR
 | 4 | mode と adapter を選ぶ | Renderer choice |
 | 5 | render 前に config を検証する | Strict config check |
 | 6 | render または refresh する | Skill folder または instruction bundle |
-| 7 | output を検証する | structure、metadata、ledgers、user blocks、file budget |
-| 8 | evidence がある場合だけ release する | Trigger tests、output assertions、release gate |
+| 7 | output を検証する | structure、metadata、evidence labels、ledgers、user-rule markers、file budget |
+| 8 | recorded evidence がある場合だけ release する | Trigger tests、output assertions、structure validation、file budget、trust、license attribution |
 
 ---
 
@@ -233,8 +247,9 @@ scripts/                         # renderers, validators, repo scanners, guardra
 | `node scripts/render-adapter.mjs --input config.json --adapter agents\|claude\|cursor\|copilot --output <path>` | assistant instruction files を render し、generated blocks を保持 |
 | `node scripts/check-core-principles.mjs` | protected core principle fingerprint を検証 |
 | `node scripts/file-budget.mjs [skill-dir]` | active Markdown instruction files の 9,000-token ceiling を強制 |
+| `node scripts/check-release-gate.mjs <skill-dir>` | required gates の release-gate evidence が記録されているかを確認 |
 | `node scripts/self-check.mjs` | repository 全体の health check を実行 |
-| `node scripts/install-local-skill.mjs` | この maker を local Codex personal skills directory に install |
+| `node scripts/install-local-skill.mjs [--dry-run]` | この maker の local Codex personal skill への sync を preview または実行 |
 
 ---
 
@@ -260,6 +275,13 @@ Gate は BLOCK/ALLOW のみです。Trigger tests、output assertions、structur
 validation、file budget、trust、license attribution のすべてに recorded
 evidence がある場合だけ、skill を release-ready と表現できます。
 
+Validators と guardrail scripts の範囲は意図的に限定されています。Required
+files、YAML metadata、evidence labels、release-gate evidence cells、file
+budget、user-rule preservation markers は確認できますが、skill が絶対に安全、
+完全、または publish-ready であることを証明するものではありません。Release
+readiness には、実際の trigger-test results、output assertions、Trust Gate
+review、license evidence を release gate に記録する必要があります。
+
 ---
 
 ## 🛡️ 安全モデル
@@ -282,6 +304,7 @@ regenerate してください。
 | Instruction file budget | `scripts/file-budget.mjs` |
 | Config shape and evidence labels | `validate-skill-config.mjs`, `validate-config.mjs` |
 | Rendered output structure | `validate-skill-output.mjs`, `validate-project-skill.mjs` |
+| Recorded release-gate evidence | `scripts/check-release-gate.mjs` |
 | End-to-end repository health | `scripts/self-check.mjs` |
 
 ---
