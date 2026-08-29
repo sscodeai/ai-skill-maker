@@ -196,6 +196,18 @@ try {
   assertOk("refresh functional skill", run(["scripts/render-skill.mjs", "--input", functionalConfigPath, "--output", functionalOutDir, "--strict"]));
   assertFileIncludes("functional skill preserves user rules", functionalIntentPath, functionalKeep);
   assertOk("validate refreshed functional skill", run(["scripts/validate-skill-output.mjs", functionalOutDir]));
+  assertFailIncludes("release gate checker blocks placeholder gate", run(["scripts/check-release-gate.mjs", functionalOutDir]), "BLOCK release gate");
+  const releaseGatePath = join(functionalOutDir, "references", "evals", "release-gate.md");
+  const filledReleaseGate = readFileSync(releaseGatePath, "utf8")
+    .replace(/\| Trigger \|[^\n]+\n/, "| Trigger | Every row in `references/evals/trigger-tests.md` passes in a fresh session | ALLOW | Recorded fresh-session trigger run 2026-08-29. |\n")
+    .replace(/\| Output \|[^\n]+\n/, "| Output | Every assertion in `references/evals/output-assertions.md` passes on the most recent run | ALLOW | Recorded assertion results against the latest generated artifact. |\n")
+    .replace(/\| Structure \|[^\n]+\n/, "| Structure | `validate-skill-output.mjs` (or the equivalent validator) passes | ALLOW | `node scripts/validate-skill-output.mjs ./functional-skill` passed. |\n")
+    .replace(/\| Budget \|[^\n]+\n/, "| Budget | Active Markdown instruction files stay within the file budget | ALLOW | `node scripts/file-budget.mjs ./functional-skill` passed. |\n")
+    .replace(/\| Trust \|[^\n]+\n/, "| Trust | No unsafe permissions, sensitive-data leakage, opaque dependencies, or unfit environment | ALLOW | Trust Gate recorded no BLOCK items for this local-only skill. |\n")
+    .replace(/\| License \|[^\n]+\n/, "| License | Third-party code, templates, examples, or assets retain their licenses and attribution | ALLOW | No third-party material added beyond project templates. |\n");
+  writeFileSync(releaseGatePath, filledReleaseGate);
+  assertOk("release gate checker passes recorded evidence", run(["scripts/check-release-gate.mjs", functionalOutDir]));
+  assertFailIncludes("release gate checker blocks missing gate", run(["scripts/check-release-gate.mjs", join(temp, "missing-gate-skill")]), "missing references/evals/release-gate.md");
   assertOk("validate genesis config strict", run(["scripts/validate-config.mjs", "--input", "assets/examples/genesis-config.json", "--mode", "genesis", "--strict"]));
   assertOk("validate repo config strict", run(["scripts/validate-config.mjs", "--input", "assets/examples/repo-config.json", "--mode", "repo", "--strict"]));
   const invalidConfigPath = join(temp, "invalid-config.json");
@@ -423,6 +435,7 @@ try {
   console.log("OK SKILL.md workflow sections");
   assertOk("core principles fingerprint check", run(["scripts/check-core-principles.mjs"]));
   assertOk("file budget guardrail", run(["scripts/file-budget.mjs"]));
+  assertFileIncludes("SKILL.md lists release gate checker", join(repoRoot, "SKILL.md"), "scripts/check-release-gate.mjs");
   assertFileIncludes("SKILL.md routes protected core", join(repoRoot, "SKILL.md"), "references/rules/protected-core-principles.md");
   assertFileIncludes("SKILL.md routes file budget", join(repoRoot, "SKILL.md"), "scripts/file-budget.mjs");
   assertFileIncludes("SKILL.md routes trust gate", join(repoRoot, "SKILL.md"), "references/checklists/trust-gate.md");
