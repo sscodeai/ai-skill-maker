@@ -121,34 +121,24 @@ node scripts/install-local-skill.mjs
 
 ## 🧭 ワークフロー
 
-```text
-┌──────────────┐
-│ Root Problem │
-└──────┬───────┘
-       ↓
-┌──────────────┐
-│  Trust Gate  │
-└──────┬───────┘
-       ↓
-┌─────────────────────┐
-│ Evidence And Intent │
-└──────┬──────────────┘
-       ↓
-┌───────────────┐
-│ Strict Config │
-└──────┬────────┘
-       ↓
-┌────────┐
-│ Render │
-└───┬────┘
-    ↓
-┌──────────┐
-│ Validate │
-└────┬─────┘
-     ↓
-┌──────────────┐
-│ Release Gate │
-└──────────────┘
+```mermaid
+flowchart LR
+  A["Root Problem<br/><small>smallest useful capability</small>"]
+  B{"Trust Gate<br/><small>PASS / BLOCK</small>"}
+  C["Evidence & Intent<br/><small>facts, intent, standards, assumptions</small>"]
+  D["Strict Config<br/><small>schema-validated JSON</small>"]
+  E["Render<br/><small>skill or instruction bundle</small>"]
+  F["Validate<br/><small>structure, metadata, budget</small>"]
+  G{"Release Gate<br/><small>ALLOW / BLOCK</small>"}
+
+  A --> B
+  B -->|PASS| C
+  B -.->|BLOCK| H["Resolve risk<br/><small>permissions, secrets, dependencies</small>"]
+  H -.-> B
+  C --> D --> E --> F --> G
+  G -->|ALLOW| I["Ready to use"]
+  G -.->|BLOCK| J["Add evidence<br/><small>tests, assertions, license, trust</small>"]
+  J -.-> F
 ```
 
 | Step | Gate | Output |
