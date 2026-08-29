@@ -9,7 +9,7 @@
 [![Skill: Codex](https://img.shields.io/badge/Codex-Personal%20Skill-111827.svg)](#-install-as-a-codex-skill)
 [![Validation: self-check](https://img.shields.io/badge/Validation-self--check-success.svg)](#-validation--release)
 
-[日本語版](README.ja.md)
+[日本語](README.ja.md)
 
 </div>
 
