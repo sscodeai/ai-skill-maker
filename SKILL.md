@@ -105,7 +105,7 @@ Use the shared output contract before emitting adapter-specific files.
 - `scripts/render-project-skill.mjs --input config.json --output <skill-dir> [--template <dir>] [--mode genesis|repo] [--strict]`: current compatibility renderer for project maintainer skills while general skill rendering is added. Use `--print-schema` to show the project maintainer config schema.
 - `scripts/validate-project-skill.mjs <skill-dir>`: current compatibility validator for generated project maintainer skill folders.
 - `scripts/self-check.mjs [--check-installed]`: run repository health checks for render, validation, template failure behavior, and optional installed skill sync.
-- `scripts/install-local-skill.mjs [--skills-dir <dir>]`: sync this repository to the local Codex personal skills directory.
+- `scripts/install-local-skill.mjs [--skills-dir <dir>] [--dry-run]`: sync this repository to the local Codex personal skills directory, or preview the install target and payload without writing files.
 
 Read scripts only when debugging or changing behavior; they are designed to run directly.
 

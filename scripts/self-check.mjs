@@ -47,6 +47,16 @@ function assertFailIncludes(label, result, text) {
   console.log(`OK ${label}`);
 }
 
+function assertOutputIncludes(label, result, text) {
+  const output = `${result.stdout}\n${result.stderr}`;
+  if (!output.includes(text)) {
+    console.error(`FAIL ${label}`);
+    console.error(output.trim());
+    process.exit(1);
+  }
+  console.log(`OK ${label}`);
+}
+
 function assertFileIncludes(label, path, text) {
   const content = readFileSync(path, "utf8");
   if (!content.includes(text)) {
@@ -389,6 +399,21 @@ try {
   writeFileSync(join(budgetTarget, "SKILL.md"), "A".repeat(40000));
   writeFileSync(join(budgetTarget, "references", "small.md"), "ok\n");
   assertFailIncludes("file budget checks target SKILL.md", run(["scripts/file-budget.mjs", budgetTarget]), "SKILL.md");
+  const dryRunSkillsDir = join(temp, "dry-run-skills");
+  const dryRun = run(["scripts/install-local-skill.mjs", "--skills-dir", dryRunSkillsDir, "--dry-run"]);
+  assertOk("install dry-run succeeds", dryRun);
+  assertOutputIncludes("install dry-run reports no writes", dryRun, "DRY RUN: no files written or deleted");
+  assertOutputIncludes("install dry-run reports payload", dryRun, "Payload: SKILL.md, agents, references, assets, scripts");
+  assertOutputIncludes("install dry-run reports replacement", dryRun, "Would replace existing ai-skill-maker skill: no");
+  assertFileNotExists("install dry-run does not create skills dir", dryRunSkillsDir);
+  const dryRunExistingDir = join(temp, "dry-run-existing-skills");
+  const dryRunExistingSkill = join(dryRunExistingDir, "ai-skill-maker");
+  mkdirSync(dryRunExistingSkill, { recursive: true });
+  writeFileSync(join(dryRunExistingSkill, "KEEP.txt"), "preserve me\n");
+  const dryRunReplace = run(["scripts/install-local-skill.mjs", "--skills-dir", dryRunExistingDir, "--dry-run"]);
+  assertOk("install dry-run with existing skill succeeds", dryRunReplace);
+  assertOutputIncludes("install dry-run reports replacement yes", dryRunReplace, "Would replace existing ai-skill-maker skill: yes");
+  assertFileIncludes("install dry-run does not delete existing skill", join(dryRunExistingSkill, "KEEP.txt"), "preserve me");
 
   const skill = readFileSync(join(repoRoot, "SKILL.md"), "utf8");
   if (!skill.includes("## Mode Selection") || !skill.includes("## Core Workflow")) {

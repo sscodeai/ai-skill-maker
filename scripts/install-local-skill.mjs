@@ -14,6 +14,7 @@ function parseArgs(argv) {
   for (let i = 2; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === "--skills-dir") args.skillsDir = argv[++i];
+    else if (arg === "--dry-run") args.dryRun = true;
     else if (arg === "--help") args.help = true;
     else throw new Error(`Unknown argument: ${arg}`);
   }
@@ -22,7 +23,7 @@ function parseArgs(argv) {
 
 function usage() {
   console.log(`Usage:
-  node scripts/install-local-skill.mjs [--skills-dir <dir>]`);
+  node scripts/install-local-skill.mjs [--skills-dir <dir>] [--dry-run]`);
 }
 
 function copyDir(source, dest) {
@@ -57,9 +58,20 @@ if (args.help) {
 }
 
 const installDir = join(args.skillsDir, "ai-skill-maker");
+const sourceIsInstallDir = existsSync(installDir) && realpathSync(installDir) === realpathSync(repoRoot);
+const willReplace = existsSync(installDir) && !sourceIsInstallDir;
+
+if (args.dryRun) {
+  console.log("DRY RUN: no files written or deleted");
+  console.log(`Install directory: ${installDir}`);
+  console.log(`Payload: ${skillPayload.join(", ")}`);
+  console.log(`Existing ai-skill-maker skill: ${existsSync(installDir) ? (sourceIsInstallDir ? "same directory as source" : "present") : "absent"}`);
+  console.log(`Would replace existing ai-skill-maker skill: ${willReplace ? "yes" : "no"}`);
+  process.exit(0);
+}
+
 mkdirSync(args.skillsDir, { recursive: true });
 
-const sourceIsInstallDir = existsSync(installDir) && realpathSync(installDir) === realpathSync(repoRoot);
 if (!sourceIsInstallDir) {
   rmSync(installDir, { recursive: true, force: true });
   mkdirSync(installDir, { recursive: true });
